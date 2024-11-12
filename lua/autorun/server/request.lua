@@ -37,8 +37,12 @@ function RegisterCloudboxDownload(id, requester)
 
 	ActiveCloudboxDownloads[id] = {["requester"] = requester, ["downloaders"] = downloaders}
 
-	local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. id
-	http.Fetch(url, PackageContentSuccess)
+	if file.Exists("cloudbox/downloads/" .. id .. ".gma", "DATA") then
+		MountCloudboxPackage(id)
+	else
+		local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. id
+		http.Fetch(url, PackageContentSuccess)
+	end
 end
 
 net.Receive("CloudboxClientDownloadRequest", function(_, ply)
