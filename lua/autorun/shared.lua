@@ -17,8 +17,13 @@
 */
 
 if SERVER then
+	// client
 	util.AddNetworkString("CloudboxClientDownloadRequest")
+	util.AddNetworkString("CloudboxClientDownloadFinished")
+
+	// server
 	util.AddNetworkString("CloudboxServerDownloadRequest")
+	util.AddNetworkString("CloudboxServerDownloadFinished")
 end
 
 if !file.IsDir("cloudbox", "DATA") then
@@ -29,42 +34,43 @@ if !file.IsDir("cloudbox/downloads", "DATA") then
 	file.CreateDir("cloudbox/downloads")
 end
 
+ActiveCloudboxDownloads = {}
+
 function PackageContentSuccess(body, size, headers)
 	local id = headers["x-package-id"]
-	local rev = headers["x-package-revision"]
 
+	// tell clients they need to start downloading this
 	if SERVER then
 		net.Start("CloudboxServerDownloadRequest")
 		net.WriteUInt(id, 32)
-		net.WriteUInt(rev, 16)
 		net.Broadcast()
 	end
 
+	// if there's content, write it to disk and mount it
 	if size > 0 then
-		local filename = "cloudbox/downloads/" .. id .. "r" .. rev .. ".gma"
+		local filename = "cloudbox/downloads/" .. id .. ".gma"
 
 		file.Write(filename, body)
 		game.MountGMA("data/" .. filename)
-
-		if headers["x-package-type"] == "map" then
-			local split = string.Split(headers["x-package-name"], ".")
-			RunConsoleCommand("changelevel", split[1])
-		end
 	end
 
-	local url = "https://api.cl0udb0x.com/packages/get?id=" .. id .. "&rev=" .. rev
-	http.Fetch(url, PackageScriptSuccess)
+	// if client then get and execute the script now
+	if CLIENT then
+		local url = "https://api.cl0udb0x.com/packages/get?id=" .. id
+		http.Fetch(url, PackageScriptSuccess)
+	end
 end
 
 function PackageScriptSuccess(body, size, headers)
 	local info = util.JSONToTable(body)
 
-	// if there's no script then stop
-	if !info["data"] then
-		return
+	// if there's a script then decode it
+	local script = ""
+	if info["data"] then
+		script = util.Base64Decode(info["data"])
 	end
 
-	local script = util.Base64Decode(info["data"])
+	// execute script / change map
 	local classname = "toybox_" .. info["id"]
 
 	if info["type"] == "entity" then
@@ -74,11 +80,6 @@ function PackageScriptSuccess(body, size, headers)
 		scripted_ents.Register(ENT, classname)
 
 		ENT = nil
-
-		if CLIENT then
-			RunConsoleCommand("gm_spawnsent", classname)
-			surface.PlaySound("ui/buttonclickrelease.wav")
-		end
 	elseif info["type"] == "weapon" then
 		SWEP = {
 			Primary = {},
@@ -89,10 +90,25 @@ function PackageScriptSuccess(body, size, headers)
 		weapons.Register(SWEP, classname)
 
 		SWEP = nil
-
-		if CLIENT then
-			RunConsoleCommand("gm_giveswep", classname)
-			surface.PlaySound("ui/buttonclickrelease.wav")
+	elseif info["type"] == "map" then
+		if SERVER and ActiveCloudboxDownloads[info["id"]]["requester"]:IsAdmin() then
+			local split = string.Split(info["name"], ".")
+			RunConsoleCommand("changelevel", split[1])
 		end
+	end
+
+	if CLIENT then
+		// tell server we have it downloaded
+		net.Start("CloudboxClientDownloadFinished")
+		net.WriteUInt(info["id"], 32)
+		net.SendToServer()
+	else // server
+		// tell requester everyone has it downloaded
+		net.Start("CloudboxServerDownloadFinished")
+		net.WriteString(info["type"])
+		net.WriteUInt(info["id"], 32)
+		net.Send(ActiveCloudboxDownloads[info["id"]]["requester"])
+
+		ActiveCloudboxDownloads[info["id"]] = nil
 	end
 end

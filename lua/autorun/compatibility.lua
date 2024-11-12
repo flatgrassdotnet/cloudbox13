@@ -16,7 +16,4 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function ValidEntity(object)
-	if (!object) then return false end
-	return object:IsValid()
-end
+ValidEntity = IsValid

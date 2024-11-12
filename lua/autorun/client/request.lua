@@ -21,15 +21,27 @@ function RequestCloudboxDownload(type, id, rev)
 
 	net.Start("CloudboxClientDownloadRequest")
 	net.WriteUInt(id, 32)
-	net.WriteUInt(rev, 16)
 	net.SendToServer()
 end
 
 net.Receive("CloudboxServerDownloadRequest", function()
 	local id = net.ReadUInt(32)
-	local rev = net.ReadUInt(16)
-
-	local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. id .. "&rev=" .. rev
+	local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. id
 
 	http.Fetch(url, PackageContentSuccess)
+end)
+
+net.Receive("CloudboxServerDownloadFinished", function()
+	local type = net.ReadString()
+	local id = net.ReadUInt(32)
+
+	local classname = "toybox_" .. id
+
+	if type == "weapon" then
+		RunConsoleCommand("gm_giveswep", classname)
+	elseif type == "entity" then
+		RunConsoleCommand("gm_spawnsent", classname)
+	end
+
+	surface.PlaySound("ui/buttonclickrelease.wav")
 end)
