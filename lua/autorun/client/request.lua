@@ -17,6 +17,18 @@
 */
 
 function RequestCloudboxDownload(type, id, rev)
+	if type == "savemap" then
+		notification.AddLegacy("Sorry, save loading isn't finished!", NOTIFY_ERROR, 3)
+		surface.PlaySound("buttons/button10.wav")
+		return
+	end
+
+	if type == "map" and !LocalPlayer():IsAdmin() then
+		notification.AddLegacy("Sorry, only admins can change map!", NOTIFY_ERROR, 3)
+		surface.PlaySound("buttons/button10.wav")
+		return
+	end
+
 	surface.PlaySound("garrysmod/content_downloaded.wav")
 
 	net.Start("CloudboxClientDownloadRequest")
