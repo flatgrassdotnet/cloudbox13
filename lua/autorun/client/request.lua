@@ -54,13 +54,15 @@ net.Receive("CloudboxServerDownloadProgress", function()
 	local progress = net.ReadFloat()
 
 	notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading...", progress)
+
+	if progress == 1 then
+		notification.Kill("CloudboxPackageDownload" .. id)
+	end
 end)
 
 net.Receive("CloudboxServerDownloadFinished", function()
 	local type = net.ReadString()
 	local id = net.ReadUInt(32)
-
-	notification.Kill("CloudboxPackageDownload" .. id)
 
 	local classname = "toybox_" .. id
 
