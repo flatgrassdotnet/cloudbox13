@@ -41,6 +41,10 @@ net.Receive("CloudboxServerDownloadRequest", function()
 
 	notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading...")
 
+	timer.Create("CloudboxNotificationKiller" .. id, 30, 1, function()
+		notification.Kill("CloudboxPackageDownload" .. id)
+	end)
+
 	if file.Exists("cloudbox/downloads/" .. id .. ".gma", "DATA") then
 		MountCloudboxPackage(id)
 	else
@@ -57,6 +61,7 @@ net.Receive("CloudboxServerDownloadProgress", function()
 
 	if progress == 1 then
 		notification.Kill("CloudboxPackageDownload" .. id)
+		timer.Remove("CloudboxNotificationKiller" .. id)
 	end
 end)
 
