@@ -23,6 +23,7 @@ if SERVER then
 
 	// server
 	util.AddNetworkString("CloudboxServerDownloadRequest")
+	util.AddNetworkString("CloudboxServerDownloadProgress")
 	util.AddNetworkString("CloudboxServerDownloadFinished")
 end
 

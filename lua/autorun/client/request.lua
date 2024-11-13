@@ -39,6 +39,8 @@ end
 net.Receive("CloudboxServerDownloadRequest", function()
 	local id = net.ReadUInt(32)
 
+	notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading...")
+
 	if file.Exists("cloudbox/downloads/" .. id .. ".gma", "DATA") then
 		MountCloudboxPackage(id)
 	else
@@ -47,9 +49,18 @@ net.Receive("CloudboxServerDownloadRequest", function()
 	end
 end)
 
+net.Receive("CloudboxServerDownloadProgress", function()
+	local id = net.ReadUInt(32)
+	local progress = net.ReadFloat()
+
+	notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading...", progress)
+end)
+
 net.Receive("CloudboxServerDownloadFinished", function()
 	local type = net.ReadString()
 	local id = net.ReadUInt(32)
+
+	notification.Kill("CloudboxPackageDownload" .. id)
 
 	local classname = "toybox_" .. id
 

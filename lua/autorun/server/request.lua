@@ -16,16 +16,18 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function IsCloudboxDownloadFinished(id)
+function GetCloudboxDownloadProgress(id)
+	local total = 0
+	local done = 0
+
 	for _, finished in pairs(ActiveCloudboxDownloads[id]["downloaders"]) do
-		// if someone isn't done then we're not finished
-		if !finished then
-			return false
+		total = total + 1
+		if finished then
+			done = done + 1
 		end
 	end
 
-	// otherwise it's done
-	return true
+	return done / total
 end
 
 function RegisterCloudboxDownload(id, requester)
@@ -45,6 +47,13 @@ function RegisterCloudboxDownload(id, requester)
 	end
 end
 
+function NotifyCloudboxDownloadProgress(id, progress)
+	net.Start("CloudboxServerDownloadProgress")
+	net.WriteUInt(id, 32)
+	net.WriteFloat(progress)
+	net.Broadcast()
+end
+
 net.Receive("CloudboxClientDownloadRequest", function(_, ply)
 	local id = net.ReadUInt(32)
 
@@ -56,7 +65,11 @@ net.Receive("CloudboxClientDownloadFinished", function(_, ply)
 
 	ActiveCloudboxDownloads[id]["downloaders"][ply:SteamID()] = true
 
-	if IsCloudboxDownloadFinished(id) then
+	progress = GetCloudboxDownloadProgress(id)
+
+	NotifyCloudboxDownloadProgress(id, progress)
+
+	if progress == 1 then
 		local url = "https://api.cl0udb0x.com/packages/get?id=" .. id
 		http.Fetch(url, PackageScriptSuccess)
 	end
