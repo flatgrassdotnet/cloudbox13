@@ -39,6 +39,11 @@ function RegisterCloudboxDownload(id, requester)
 
 	ActiveCloudboxDownloads[id] = {["requester"] = requester, ["downloaders"] = downloaders}
 
+	// tell clients they need to start downloading this
+	net.Start("CloudboxServerDownloadRequest")
+	net.WriteUInt(id, 32)
+	net.Broadcast()
+
 	if file.Exists("cloudbox/downloads/" .. id .. ".gma", "DATA") then
 		MountCloudboxPackage(id)
 	else
@@ -70,7 +75,6 @@ net.Receive("CloudboxClientDownloadFinished", function(_, ply)
 	NotifyCloudboxDownloadProgress(id, progress)
 
 	if progress == 1 then
-		local url = "https://api.cl0udb0x.com/packages/get?id=" .. id
-		http.Fetch(url, PackageScriptSuccess)
+		DownloadCloudboxScript(id)
 	end
 end)

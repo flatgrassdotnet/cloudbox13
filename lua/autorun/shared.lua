@@ -37,26 +37,21 @@ end
 
 ActiveCloudboxDownloads = {}
 
-function NotifyCloudboxPackageDownload(id)
-	// tell clients they need to start downloading this
-	if SERVER then
-		net.Start("CloudboxServerDownloadRequest")
-		net.WriteUInt(id, 32)
-		net.Broadcast()
-	end
-
-	// if client then get and execute the script now
-	if CLIENT then
-		local url = "https://api.cl0udb0x.com/packages/get?id=" .. id
-		http.Fetch(url, PackageScriptSuccess)
-	end
+function DownloadCloudboxScript(id)
+	local url = "https://api.cl0udb0x.com/packages/get?id=" .. id
+	http.Fetch(url, PackageScriptSuccess)
 end
 
 function MountCloudboxPackage(id)
 	local filename = "cloudbox/downloads/" .. id .. ".gma"
-	game.MountGMA("data/" .. filename)
 
-	NotifyCloudboxPackageDownload(id)
+	if file.Exists(filename, "DATA") then
+		game.MountGMA("data/" .. filename)
+	end
+
+	if CLIENT then
+		DownloadCloudboxScript(id)
+	end
 end
 
 function PackageContentSuccess(body, size, headers)
@@ -66,10 +61,9 @@ function PackageContentSuccess(body, size, headers)
 	if size > 0 then
 		local filename = "cloudbox/downloads/" .. id .. ".gma"
 		file.Write(filename, body)
-		MountCloudboxPackage(id)
-	else
-		NotifyCloudboxPackageDownload(id)
 	end
+
+	MountCloudboxPackage(id)
 end
 
 function PackageScriptSuccess(body, size, headers)
