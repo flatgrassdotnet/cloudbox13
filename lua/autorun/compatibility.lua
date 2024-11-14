@@ -35,6 +35,8 @@ WorldSound = sound.Play
 ValidEntity = IsValid
 
 function gm13ize(script)
+	local ent = FindMetaTable("Entity")
+
 	// "IMaterial:SetMaterialTexture is now IMaterial:SetTexture"
 	local translated, _ = string.gsub(script, ":SetMaterialTexture%(", ":SetTexture%(")
 
@@ -63,16 +65,30 @@ function gm13ize(script)
 	translated, _ = string.gsub(translated, ":SetMaterialVector%(", ":SetVector%(")
 
 	// "Player:GetCursorAimVector is now Player:GetAimVector"
-	translated, _ = string.gsub(translated, ":GetPlayerAimVector%(", ":GetAimVector%(")
 	translated, _ = string.gsub(translated, ":GetCursorAimVector%(", ":GetAimVector%(")
+	translated, _ = string.gsub(translated, ":GetPlayerAimVector%(", ":GetAimVector%(")
 
 	// SetModelScale takes number now, not Vector
-	// FIXME: only covers cases with explicit Vector(), not ones using a var
-	function CloudboxVectorAverage(x, y, z)
-		return (x + y + z) / 3
+	function ent:SetModelScaleCloudbox(vector)
+		self:SetLegacyTransform(true)
+
+		x, y, z = vector.Unpack()
+
+		self:SetModelScale((x + y + z) / 3)
 	end
 
-	translated, _ = string.gsub(translated, ":SetModelScale%(%s*Vector%(", ":SetModelScale%(CloudboxVectorAverage%(")
+	translated, _ = string.gsub(translated, ":SetModelScale%(", ":SetModelScaleCloudbox%(")
+
+	// SetColor takes Color() now
+	function ent:SetColorCloudbox(r, g, b, a)
+		if IsColor(r) then
+			self:SetColor(r)
+		else
+			self:SetColor(Color(r, g, b, a))
+		end
+	end
+
+	translated, _ = string.gsub(translated, ":SetColor%(", ":SetColorCloudbox%(")
 
 	// CreateFont takes a table now
 	function CloudboxCreateFont(font_name, size, weight, antialiasing, additive, new_font_name, drop_shadow, outlined, blur)
@@ -92,3 +108,5 @@ function gm13ize(script)
 
 	return translated
 end
+
+
