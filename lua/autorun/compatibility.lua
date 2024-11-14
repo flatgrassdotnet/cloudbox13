@@ -118,5 +118,8 @@ function gm13ize(script)
 	// Comment out AddCSLuaFile call, we already do this with Cloudbox
 	translated, _ = string.gsub(translated, "AddCSLuaFile%(", "//AddCSLuaFile%(")
 
+	// Use weapon_cs_base_cloudbox for weapon_cs_base
+	translated, _ = string.gsub(translated, "\"weapon_cs_base\"", "\"weapon_cs_base_cloudbox\"")
+
 	return translated
 end
