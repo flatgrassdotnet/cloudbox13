@@ -65,5 +65,13 @@ function gm13ize(script)
 	// "Player:GetCursorAimVector is now Player:GetAimVector"
 	translated, _ = string.gsub(translated, ":GetAimVector%(", ":GetPlayerAimVector%(")
 
+	// SetModelScale takes number now, not Vector
+	// FIXME: only covers cases with explicit Vector(), not ones using a var
+	function CloudboxVectorAverage(x, y, z)
+		return (x + y + z) / 3
+	end
+
+	translated, _ = string.gsub(translated, ":SetModelScale%(%s*Vector%(", ":SetModelScale%(CloudboxVectorAverage%(")
+
 	return translated
 end
