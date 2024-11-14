@@ -82,7 +82,7 @@ function cEntity:SetModelScaleCloudbox(vector)
 	self:SetModelScale((x + y + z) / 3)
 end
 
-function CloudboxCreateFont(font_name, size, weight, antialiasing, additive, new_font_name, drop_shadow, outlined, blur)
+function CreateFontCloudbox(font_name, size, weight, antialiasing, additive, new_font_name, drop_shadow, outlined, blur)
 	surface.CreateFont(new_font_name, {
 		font = font_name,
 		size = size,
@@ -113,7 +113,7 @@ function gm13ize(script)
 	translated, _ = string.gsub(translated, ":SetModelScale%(", ":SetModelScaleCloudbox%(")
 
 	// CreateFont takes a table now
-	translated, _ = string.gsub(translated, "surface.CreateFont%(", "CloudboxCreateFont%(")
+	translated, _ = string.gsub(translated, "surface.CreateFont%(", "CreateFontCloudbox%(")
 
 	// Comment out AddCSLuaFile call, we already do this with Cloudbox
 	translated, _ = string.gsub(translated, "AddCSLuaFile%(", "//AddCSLuaFile%(")

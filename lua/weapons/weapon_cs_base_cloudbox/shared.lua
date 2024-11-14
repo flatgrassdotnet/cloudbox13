@@ -17,8 +17,8 @@ if ( CLIENT ) then
 	SWEP.CSMuzzleFlashes	= true
 	
 	// This is the font that's used to draw the death icons
-	CloudboxCreateFont( "csd", ScreenScale( 30 ), 500, true, true, "CSKillIcons" )
-	CloudboxCreateFont( "csd", ScreenScale( 60 ), 500, true, true, "CSSelectIcons" )
+	CreateFontCloudbox( "csd", ScreenScale( 30 ), 500, true, true, "CSKillIcons" )
+	CreateFontCloudbox( "csd", ScreenScale( 60 ), 500, true, true, "CSSelectIcons" )
 
 end
 
