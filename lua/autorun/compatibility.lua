@@ -63,7 +63,8 @@ function gm13ize(script)
 	translated, _ = string.gsub(translated, ":SetMaterialVector%(", ":SetVector%(")
 
 	// "Player:GetCursorAimVector is now Player:GetAimVector"
-	translated, _ = string.gsub(translated, ":GetAimVector%(", ":GetPlayerAimVector%(")
+	translated, _ = string.gsub(translated, ":GetPlayerAimVector%(", ":GetAimVector%(")
+	translated, _ = string.gsub(translated, ":GetCursorAimVector%(", ":GetAimVector%(")
 
 	// SetModelScale takes number now, not Vector
 	// FIXME: only covers cases with explicit Vector(), not ones using a var
