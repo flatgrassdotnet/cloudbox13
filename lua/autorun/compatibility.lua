@@ -115,5 +115,8 @@ function gm13ize(script)
 	// CreateFont takes a table now
 	translated, _ = string.gsub(translated, "surface.CreateFont%(", "CloudboxCreateFont%(")
 
+	// Comment out AddCSLuaFile call, we already do this with Cloudbox
+	translated, _ = string.gsub(translated, "AddCSLuaFile%(", "//AddCSLuaFile%(")
+
 	return translated
 end
