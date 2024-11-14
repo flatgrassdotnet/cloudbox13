@@ -68,6 +68,9 @@ function gm13ize(script)
 	translated, _ = string.gsub(translated, ":GetCursorAimVector%(", ":GetAimVector%(")
 	translated, _ = string.gsub(translated, ":GetPlayerAimVector%(", ":GetAimVector%(")
 
+	// Change mathx to math
+	translated, _ = string.gsub(translated, "mathx.", "math.")
+
 	// SetModelScale takes number now, not Vector
 	function ent:SetModelScaleCloudbox(vector)
 		self:SetLegacyTransform(true)
