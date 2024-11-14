@@ -66,6 +66,9 @@ ValidEntity = IsValid
 // mathx is now math
 mathx = math
 
+// Player:GetScriptedVehicle is now Player:GetVehicle
+cPlayer.GetScriptedVehicle = cPlayer.GetVehicle
+
 function cEntity:SetColorCloudbox(r, g, b, a)
 	if IsColor(r) then
 		self:SetColor(r)
@@ -120,6 +123,9 @@ function gm13ize(script)
 
 	// Use weapon_cs_base_cloudbox for weapon_cs_base
 	translated, _ = string.gsub(translated, "\"weapon_cs_base\"", "\"weapon_cs_base_cloudbox\"")
+
+	// Use base_vehicle_cloudbox for base_vehicle
+	translated, _ = string.gsub(translated, "\"base_vehicle\"", "\"base_vehicle_cloudbox\"")
 
 	return translated
 end
