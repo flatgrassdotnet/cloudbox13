@@ -72,7 +72,7 @@ function gm13ize(script)
 	function ent:SetModelScaleCloudbox(vector)
 		self:SetLegacyTransform(true)
 
-		x, y, z = vector.Unpack()
+		local x, y, z = vector:Unpack()
 
 		self:SetModelScale((x + y + z) / 3)
 	end
