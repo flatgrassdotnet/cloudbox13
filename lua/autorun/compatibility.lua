@@ -73,5 +73,21 @@ function gm13ize(script)
 
 	translated, _ = string.gsub(translated, ":SetModelScale%(%s*Vector%(", ":SetModelScale%(CloudboxVectorAverage%(")
 
+	// CreateFont takes a table now
+	function CloudboxCreateFont(font_name, size, weight, antialiasing, additive, new_font_name, drop_shadow, outlined, blur)
+		surface.CreateFont(new_font_name, {
+			font = font_name,
+			size = size,
+			weight = weight,
+			antialias = antialiasing,
+			additive = additive,
+			shadow = drop_shadow,
+			outline = outlined,
+			blur = blursize
+		})
+	end
+
+	translated, _ = string.gsub(translated, "surface.CreateFont%(", "CloudboxCreateFont%(")
+
 	return translated
 end
