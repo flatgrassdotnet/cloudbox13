@@ -81,7 +81,7 @@ function PackageScriptSuccess(body, size, headers)
 	if info["type"] == "entity" then
 		ENT = {}
 
-		RunString(script)
+		RunString(gm13ize(script))
 		scripted_ents.Register(ENT, classname)
 
 		ENT = nil
@@ -91,7 +91,7 @@ function PackageScriptSuccess(body, size, headers)
 			Secondary = {}
 		}
 
-		RunString(script)
+		RunString(gm13ize(script))
 		weapons.Register(SWEP, classname)
 
 		SWEP = nil
