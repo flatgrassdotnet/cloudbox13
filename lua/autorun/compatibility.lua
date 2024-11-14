@@ -31,8 +31,18 @@ if CLIENT then
 end
 
 // "IMaterial:SetMaterialTexture is now IMaterial:SetTexture"
+cIMaterial.GetMaterialFloat = cIMaterial.GetFloat
+cIMaterial.SetMaterialFloat = cIMaterial.SetFloat
+cIMaterial.GetMaterialInt = cIMaterial.GetInt
+cIMaterial.SetMaterialInt = cIMaterial.SetInt
+cIMaterial.GetMaterialMatrix = cIMaterial.GetMatrix
+cIMaterial.SetMaterialMatrix = cIMaterial.SetMatrix
+cIMaterial.GetMaterialString = cIMaterial.GetString
+cIMaterial.SetMaterialString = cIMaterial.SetString
 cIMaterial.GetMaterialTexture = cIMaterial.GetTexture
 cIMaterial.SetMaterialTexture = cIMaterial.SetTexture
+cIMaterial.GetMaterialVector = cIMaterial.GetVector
+cIMaterial.SetMaterialVector = cIMaterial.SetVector
 
 // "utilx no longer exists. Please replace all ocurances of utilx in your code to the util"
 utilx = util
