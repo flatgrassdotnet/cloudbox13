@@ -100,7 +100,7 @@ end
 
 function gm13ize(script)
 	// "Entity:SetColor and Entity:GetColor now deal with Colors only"
-	local translated, _ = string.gsub(script, ":SetColor%(", ":SetColorCloudbox%(")
+	local translated, _ = string.gsub(script, ":SetColor%s*%(", ":SetColorCloudbox%(")
 
 	// "entity.Classname. Caps is now enforced properly. Use entity.ClassName instead. (N is upper case)"
 	translated, _ = string.gsub(translated, ".Classname", ".ClassName")
@@ -109,17 +109,17 @@ function gm13ize(script)
 	translated, _ = string.gsub(translated, "\"DMultiChoice\"", "\"DComboBox\"")
 
 	// "Angle functions have been unified. Before some were Set/GetAngles and some were Set/GetAngle. Now they're all Set/GetAngles()"
-	translated, _ = string.gsub(translated, ":SetAngle%(", ":SetAngles%(")
-	translated, _ = string.gsub(translated, ":GetAngle%(", ":GetAngles%(")
+	translated, _ = string.gsub(translated, ":SetAngle%s*%(", ":SetAngles%(")
+	translated, _ = string.gsub(translated, ":GetAngle%s*%(", ":GetAngles%(")
 
 	// SetModelScale takes number now, not Vector
-	translated, _ = string.gsub(translated, ":SetModelScale%(", ":SetModelScaleCloudbox%(")
+	translated, _ = string.gsub(translated, ":SetModelScale%s*%(", ":SetModelScaleCloudbox%(")
 
 	// CreateFont takes a table now
-	translated, _ = string.gsub(translated, "surface.CreateFont%(", "CreateFontCloudbox%(")
+	translated, _ = string.gsub(translated, "surface.CreateFont%s*%(", "CreateFontCloudbox%(")
 
 	// Comment out AddCSLuaFile call, we already do this with Cloudbox
-	translated, _ = string.gsub(translated, "AddCSLuaFile%(", "//AddCSLuaFile%(")
+	translated, _ = string.gsub(translated, "AddCSLuaFile%s*%(", "//AddCSLuaFile%(")
 
 	// Use weapon_cs_base_cloudbox for weapon_cs_base
 	translated, _ = string.gsub(translated, "\"weapon_cs_base\"", "\"weapon_cs_base_cloudbox\"")
