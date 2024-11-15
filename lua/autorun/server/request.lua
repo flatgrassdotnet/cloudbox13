@@ -48,6 +48,13 @@ function LoadCloudboxPackage(info, requester)
 		return
 	end
 
+	// experimental includes support
+	if info["includes"] then
+		for _, inc in pairs(info["includes"]) do
+			RegisterCloudboxDownload(inc["id"], inc["rev"], requester)
+		end
+	end
+
 	// get downloaders list
 	local downloaders = {}
 	for _, ply in ipairs(player.GetAll()) do
