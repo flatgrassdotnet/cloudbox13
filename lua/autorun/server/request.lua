@@ -16,6 +16,8 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+ActiveCloudboxDownloads = {}
+
 function GetCloudboxDownloadProgress(id)
 	local total = 0
 	local done = 0
@@ -30,25 +32,49 @@ function GetCloudboxDownloadProgress(id)
 	return done / total
 end
 
-function RegisterCloudboxDownload(id, requester)
+function BroadcastCloudboxPackageDownload(info, requester)
+	local data = util.Compress(util.TableToJSON(info))
+
+	net.Start("CloudboxServerDownloadRequest")
+	net.WriteInt(string.len(data), 16)
+	net.WriteData(data)
+	net.WriteString(requester:SteamID64())
+	net.Broadcast()
+end
+
+function LoadCloudboxPackage(info, requester)
+	if info["type"] == "map" and !GetConVar("cloudbox_userchangelevel"):GetBool() and !requester:IsAdmin() then
+		print("User \"" .. requester:Name() .. "\" (" .. requester:SteamID64() .. ") tried to changelevel to a Cloudbox map without permission.")
+		return
+	end
+
 	// get downloaders list
 	local downloaders = {}
 	for _, ply in ipairs(player.GetAll()) do
 		downloaders[ply:SteamID()] = false
 	end
 
-	ActiveCloudboxDownloads[id] = {["requester"] = requester, ["downloaders"] = downloaders}
+	// register
+	ActiveCloudboxDownloads[info["id"]] = {["info"] = info, ["requester"] = requester, ["downloaders"] = downloaders}
 
-	// tell clients they need to start downloading this
-	net.Start("CloudboxServerDownloadRequest")
-	net.WriteUInt(id, 32)
-	net.Broadcast()
+	// tell everyone to start downloading the package
+	BroadcastCloudboxPackageDownload(info, requester)
 
-	if file.Exists("cloudbox/downloads/" .. id .. ".gma", "DATA") then
-		MountCloudboxPackage(id)
-	else
-		local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. id
-		http.Fetch(url, PackageContentSuccess)
+	MountCloudboxPackage(info)
+end
+
+function RegisterCloudboxDownload(id, rev, requester)
+	local path = "cloudbox/downloads/" .. id .. "r" .. rev .. ".json"
+	if file.Exists(path, "DATA") then // if we have the package info locally then load it
+		LoadCloudboxPackage(util.JSONToTable(file.Read(path)), requester)
+	else // otherwise get it from cloudbox
+		local url = "https://api.cl0udb0x.com/packages/get?id=" .. id .. "&rev=" .. rev
+		http.Fetch(url, function(body, size)
+			if size > 0 then
+				file.Write(path, body) // write to disk
+				LoadCloudboxPackage(util.JSONToTable(body), requester)
+			end
+		end)
 	end
 end
 
@@ -63,8 +89,9 @@ net.Receive("CloudboxClientDownloadRequest", function(_, ply)
 	if GetConVar("cloudbox_adminonly"):GetBool() and !ply:IsAdmin() then return end
 
 	local id = net.ReadUInt(32)
+	local rev = net.ReadUInt(32)
 
-	RegisterCloudboxDownload(id, ply)
+	RegisterCloudboxDownload(id, rev, ply)
 end)
 
 net.Receive("CloudboxClientDownloadFinished", function(_, ply)
@@ -79,6 +106,6 @@ net.Receive("CloudboxClientDownloadFinished", function(_, ply)
 	NotifyCloudboxDownloadProgress(id, progress)
 
 	if progress == 1 then
-		DownloadCloudboxScript(id)
+		ExecuteCloudboxPackage(ActiveCloudboxDownloads[id]["info"])
 	end
 end)

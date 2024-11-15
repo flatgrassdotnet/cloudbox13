@@ -35,40 +35,7 @@ if !file.IsDir("cloudbox/downloads", "DATA") then
 	file.CreateDir("cloudbox/downloads")
 end
 
-ActiveCloudboxDownloads = {}
-
-function DownloadCloudboxScript(id)
-	local url = "https://api.cl0udb0x.com/packages/get?id=" .. id
-	http.Fetch(url, PackageScriptSuccess)
-end
-
-function MountCloudboxPackage(id)
-	local filename = "cloudbox/downloads/" .. id .. ".gma"
-
-	if file.Exists(filename, "DATA") then
-		game.MountGMA("data/" .. filename)
-	end
-
-	if CLIENT then
-		DownloadCloudboxScript(id)
-	end
-end
-
-function PackageContentSuccess(body, size, headers)
-	local id = headers["x-package-id"]
-
-	// if there's content, write it to disk
-	if size > 0 then
-		local filename = "cloudbox/downloads/" .. id .. ".gma"
-		file.Write(filename, body)
-	end
-
-	MountCloudboxPackage(id)
-end
-
-function PackageScriptSuccess(body, size, headers)
-	local info = util.JSONToTable(body)
-
+function ExecuteCloudboxPackage(info)
 	// if there's a script then decode it
 	local script = ""
 	if info["data"] then
@@ -97,8 +64,6 @@ function PackageScriptSuccess(body, size, headers)
 		SWEP = nil
 	elseif info["type"] == "map" then
 		if SERVER then
-			if !GetConVar("cloudbox_userchangelevel"):GetBool() and !ActiveCloudboxDownloads[info["id"]]["requester"]:IsAdmin() then return end
-
 			local split = string.Split(info["name"], ".")
 			RunConsoleCommand("changelevel", split[1])
 		end
@@ -112,11 +77,31 @@ function PackageScriptSuccess(body, size, headers)
 	else // server
 		// tell requester everyone has it downloaded
 		net.Start("CloudboxServerDownloadFinished")
-		net.WriteString(info["type"])
 		net.WriteUInt(info["id"], 32)
 		net.Send(ActiveCloudboxDownloads[info["id"]]["requester"])
 
 		ActiveCloudboxDownloads[info["id"]] = nil
+	end
+end
+
+function MountCloudboxPackage(info)
+	// if client and package has no content then execute the script now
+	if CLIENT and !info["content"] then ExecuteCloudboxPackage(info) return end
+
+	// mount content, downloading first if needed
+	local path = "cloudbox/downloads/" .. info["id"] .. "r" .. info["rev"] .. ".gma"
+	if file.Exists(path, "DATA") then // if we have the package content locally then load it
+		game.MountGMA("data/" .. path)
+		if CLIENT then ExecuteCloudboxPackage(info) end
+	else // otherwise get it from cloudbox
+		local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. info["id"] .. "&rev=" .. info["rev"]
+		http.Fetch(url, function(body, size)
+			if size > 0 then
+				file.Write(path, body) // write to disk
+				game.MountGMA("data/" .. path)
+				if CLIENT then ExecuteCloudboxPackage(info) end
+			end
+		end)
 	end
 end
 

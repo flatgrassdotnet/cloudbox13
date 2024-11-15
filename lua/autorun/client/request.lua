@@ -16,6 +16,8 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+ActiveCloudboxDownloads = {}
+
 function RequestCloudboxDownload(type, id, rev)
 	if GetConVar("cloudbox_adminonly"):GetBool() and !LocalPlayer():IsAdmin() then
 		notification.AddLegacy("Sorry, you must be an admin to do that!", NOTIFY_ERROR, 3)
@@ -39,42 +41,52 @@ function RequestCloudboxDownload(type, id, rev)
 
 	net.Start("CloudboxClientDownloadRequest")
 	net.WriteUInt(id, 32)
+	net.WriteUInt(rev, 32)
 	net.SendToServer()
 end
 
 net.Receive("CloudboxServerDownloadRequest", function()
-	local id = net.ReadUInt(32)
+	local size = net.ReadInt(16)
+	local data = net.ReadData(size)
+	local steamid = net.ReadString()
 
-	notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading...")
+	local requester = player.GetBySteamID64(steamid)
+	local info = util.JSONToTable(util.Decompress(data))
 
-	timer.Create("CloudboxNotificationKiller" .. id, 30, 1, function()
-		notification.Kill("CloudboxPackageDownload" .. id)
+	// register
+	ActiveCloudboxDownloads[info["id"]] = {["info"] = info, ["requester"] = requester}
+
+	notification.AddProgress("CloudboxPackageDownload" .. info["id"], "Downloading \"" .. info["name"] .. "\"")
+
+	timer.Create("CloudboxNotificationKiller" .. info["id"], 30, 1, function()
+		notification.Kill("CloudboxPackageDownload" .. info["id"])
 	end)
 
-	if file.Exists("cloudbox/downloads/" .. id .. ".gma", "DATA") then
-		MountCloudboxPackage(id)
-	else
-		local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. id
-		http.Fetch(url, PackageContentSuccess)
-	end
+	MountCloudboxPackage(info)
 end)
 
 net.Receive("CloudboxServerDownloadProgress", function()
 	local id = net.ReadUInt(32)
 	local progress = net.ReadFloat()
 
-	notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading...", progress)
+	notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading \"" .. ActiveCloudboxDownloads[id]["info"]["name"] .. "\"", progress)
 
 	if progress == 1 then
 		notification.Kill("CloudboxPackageDownload" .. id)
 		timer.Remove("CloudboxNotificationKiller" .. id)
+
+		// if it's not us
+		if ActiveCloudboxDownloads[id]["requester"]:SteamID64() != LocalPlayer():SteamID64() then
+			// unregister
+			ActiveCloudboxDownloads[id] = nil
+		end
 	end
 end)
 
 net.Receive("CloudboxServerDownloadFinished", function()
-	local type = net.ReadString()
 	local id = net.ReadUInt(32)
 
+	local type = ActiveCloudboxDownloads[id]["info"]["type"]
 	local classname = "toybox_" .. id
 
 	if type == "weapon" then
@@ -84,4 +96,7 @@ net.Receive("CloudboxServerDownloadFinished", function()
 	end
 
 	surface.PlaySound("ui/buttonclickrelease.wav")
+
+	// unregister
+	ActiveCloudboxDownloads[id] = nil
 end)
