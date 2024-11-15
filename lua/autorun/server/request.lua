@@ -70,6 +70,8 @@ end)
 net.Receive("CloudboxClientDownloadFinished", function(_, ply)
 	local id = net.ReadUInt(32)
 
+	if !ActiveCloudboxDownloads[id] then return end
+
 	ActiveCloudboxDownloads[id]["downloaders"][ply:SteamID()] = true
 
 	progress = GetCloudboxDownloadProgress(id)
