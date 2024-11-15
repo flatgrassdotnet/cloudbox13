@@ -96,7 +96,9 @@ function PackageScriptSuccess(body, size, headers)
 
 		SWEP = nil
 	elseif info["type"] == "map" then
-		if SERVER and ActiveCloudboxDownloads[info["id"]]["requester"]:IsAdmin() then
+		if SERVER then
+			if !GetConVar("cloudbox_userchangelevel"):GetBool() and !ActiveCloudboxDownloads[info["id"]]["requester"]:IsAdmin() then return end
+
 			local split = string.Split(info["name"], ".")
 			RunConsoleCommand("changelevel", split[1])
 		end
@@ -117,3 +119,6 @@ function PackageScriptSuccess(body, size, headers)
 		ActiveCloudboxDownloads[info["id"]] = nil
 	end
 end
+
+CreateConVar("cloudbox_userchangelevel", "0", {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, "Allow non-admins to changelevel to Cloudbox maps", 0, 1)
+CreateConVar("cloudbox_adminonly", "0", {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, "Only allow admins to download from Cloudbox", 0, 1)

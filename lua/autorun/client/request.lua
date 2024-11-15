@@ -17,14 +17,20 @@
 */
 
 function RequestCloudboxDownload(type, id, rev)
+	if GetConVar("cloudbox_adminonly"):GetBool() and !LocalPlayer():IsAdmin() then
+		notification.AddLegacy("Sorry, you must be an admin to do that!", NOTIFY_ERROR, 3)
+		surface.PlaySound("buttons/button10.wav")
+		return
+	end
+
 	if type == "savemap" then
 		notification.AddLegacy("Sorry, save loading isn't finished!", NOTIFY_ERROR, 3)
 		surface.PlaySound("buttons/button10.wav")
 		return
 	end
 
-	if type == "map" and !LocalPlayer():IsAdmin() then
-		notification.AddLegacy("Sorry, only admins can change map!", NOTIFY_ERROR, 3)
+	if type == "map" and !GetConVar("cloudbox_userchangelevel"):GetBool() and !LocalPlayer():IsAdmin() then
+		notification.AddLegacy("Sorry, you must be an admin to do that!", NOTIFY_ERROR, 3)
 		surface.PlaySound("buttons/button10.wav")
 		return
 	end

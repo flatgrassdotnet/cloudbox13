@@ -60,6 +60,8 @@ function NotifyCloudboxDownloadProgress(id, progress)
 end
 
 net.Receive("CloudboxClientDownloadRequest", function(_, ply)
+	if GetConVar("cloudbox_adminonly"):GetBool() and !ply:IsAdmin() then return end
+
 	local id = net.ReadUInt(32)
 
 	RegisterCloudboxDownload(id, ply)
