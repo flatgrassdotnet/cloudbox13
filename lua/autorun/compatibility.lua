@@ -137,5 +137,8 @@ function gm13ize(script)
 	// Use base_vehicle_cloudbox for base_vehicle
 	translated, _ = string.gsub(translated, "\"base_vehicle\"", "\"base_vehicle_cloudbox\"")
 
+	// Experimental fix for bitwise OR
+	translated, _ = string.gsub(translated, "(%u)%s*(|)%s*(%u)", "%1 %+ %3")
+
 	return translated
 end
