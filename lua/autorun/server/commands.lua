@@ -16,16 +16,9 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-concommand.Add("cloudbox_getpackage", function(_, _, args)
-	if !args[1] and !isnumber(args[1]) then
-		print("A package ID is required")
-		return
+concommand.Add("cloudbox_purgecache", function()
+	files = file.Find("cloudbox/downloads/*", "DATA")
+	for _, filename in pairs(files) do
+		file.Delete("cloudbox/downloads/" .. filename, "DATA")
 	end
-
-	if args[2] and !isnumber(args[2]) then
-		print("Invalid revision")
-		return
-	end
-
-	RequestCloudboxDownload("", args[1], args[2])
-end, nil, "Download a package from Cloudbox by ID and (optionally) revision")
+end, nil, "Purge the Cloudbox downloads cache")
