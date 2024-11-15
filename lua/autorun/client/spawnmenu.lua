@@ -17,15 +17,25 @@
 */
 
 function AddCloudboxTab()
-    local panel = vgui.Create("DPanel")
-    panel:SetBackgroundColor(Color(184, 227, 255))
+	local panel = vgui.Create("DPanel")
+	panel:SetBackgroundColor(Color(184, 227, 255))
 
-    local html = vgui.Create("DHTML", panel)
-    html:Dock(FILL)
-    html:OpenURL("https://ingame.cl0udb0x.com")
-    html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
+	local html = vgui.Create("DHTML", panel)
 
-    return panel
+	local function CloudboxFocus(focus)
+		if (focus) then
+			hook.Run("OnTextEntryGetFocus", html)
+		else
+			hook.Run("OnTextEntryLoseFocus", html)
+		end
+	end
+
+	html:Dock(FILL)
+	html:OpenURL("https://ingame.cl0udb0x.com")
+	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
+	html:AddFunction("cloudbox", "SetFocused", CloudboxFocus)
+
+	return panel
 end
 
 spawnmenu.AddCreationTab("Cloudbox", AddCloudboxTab, "materials/icon16/weather_clouds.png", 999, "Download stuff from Cloudbox!")
