@@ -42,7 +42,9 @@ function BroadcastCloudboxPackageDownload(info, requester)
 	net.Broadcast()
 end
 
-function LoadCloudboxPackage(info, requester)
+function LoadCloudboxPackage(info, requester, isInclude)
+	isInclude = isInclude or false
+
 	if info["type"] == "map" and !GetConVar("cloudbox_userchangelevel"):GetBool() and !requester:IsAdmin() then
 		print("User \"" .. requester:Name() .. "\" (" .. requester:SteamID64() .. ") tried to changelevel to a Cloudbox map without permission.")
 		return
@@ -51,7 +53,7 @@ function LoadCloudboxPackage(info, requester)
 	// experimental includes support
 	if info["includes"] then
 		for _, inc in pairs(info["includes"]) do
-			RegisterCloudboxDownload(inc["id"], inc["rev"], requester)
+			RegisterCloudboxDownload(inc["id"], inc["rev"], requester, true)
 		end
 	end
 
@@ -62,7 +64,7 @@ function LoadCloudboxPackage(info, requester)
 	end
 
 	// register
-	ActiveCloudboxDownloads[info["id"]] = {["info"] = info, ["requester"] = requester, ["downloaders"] = downloaders}
+	ActiveCloudboxDownloads[info["id"]] = {["info"] = info, ["requester"] = requester, ["downloaders"] = downloaders, ["isInclude"] = isInclude}
 
 	// tell everyone to start downloading the package
 	BroadcastCloudboxPackageDownload(info, requester)
@@ -70,16 +72,18 @@ function LoadCloudboxPackage(info, requester)
 	MountCloudboxPackage(info)
 end
 
-function RegisterCloudboxDownload(id, rev, requester)
+function RegisterCloudboxDownload(id, rev, requester, isInclude)
+	isInclude = isInclude or false
+
 	local path = "cloudbox/downloads/" .. id .. "r" .. rev .. ".json"
 	if file.Exists(path, "DATA") then // if we have the package info locally then load it
-		LoadCloudboxPackage(util.JSONToTable(file.Read(path)), requester)
+		LoadCloudboxPackage(util.JSONToTable(file.Read(path)), requester, isInclude)
 	else // otherwise get it from cloudbox
 		local url = "https://api.cl0udb0x.com/packages/get?id=" .. id .. "&rev=" .. rev
 		http.Fetch(url, function(body, size)
 			if size > 0 then
 				file.Write(path, body) // write to disk
-				LoadCloudboxPackage(util.JSONToTable(body), requester)
+				LoadCloudboxPackage(util.JSONToTable(body), requester, isInclude)
 			end
 		end)
 	end

@@ -39,16 +39,18 @@ function ExecuteCloudboxPackage(info)
 	// if there's a script then decode it
 	local script = ""
 	if info["data"] then
-		script = util.Base64Decode(info["data"])
+		script = gm13ize(util.Base64Decode(info["data"]))
 	end
 
 	// execute script / change map
 	local classname = "toybox_" .. info["id"]
 
-	if info["type"] == "entity" then
+	if ActiveCloudboxDownloads[info["id"]]["isInclude"] then
+		RunString(script)
+	elseif info["type"] == "entity" then
 		ENT = {}
 
-		RunString(gm13ize(script))
+		RunString(script)
 		scripted_ents.Register(ENT, classname)
 
 		ENT = nil
@@ -58,7 +60,7 @@ function ExecuteCloudboxPackage(info)
 			Secondary = {}
 		}
 
-		RunString(gm13ize(script))
+		RunString(script)
 		weapons.Register(SWEP, classname)
 
 		SWEP = nil
