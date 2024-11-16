@@ -140,5 +140,9 @@ function gm13ize(script)
 	// Experimental fix for bitwise OR
 	translated, _ = string.gsub(translated, "([%u%d])%s*(|)%s*(%u)", "%1 %+ %3")
 
+	// Experimental fix for bitwise AND (blame Darth for this)
+	translated, _ = string.gsub(translated, "([%w_%.]+)%s*&%s*([%w_%.]+)%s*([=><]=?)%s*([%w_%.]+)", " bit.band(%1, %2) %3 %4 ")
+	translated, _ = string.gsub(translated, "util%.PointContents%s*%(%s*([%w_%.]+)%s*%)%s*&%s*([%w_%.]+)%s*([=><!]=?)%s*([%w_%.]+)", " bit.band(util.PointContents(%1), %2) %3 %4 ")
+
 	return translated
 end
