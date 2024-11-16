@@ -51,6 +51,10 @@ function ExecuteCloudboxPackage(info)
 		ENT = {}
 
 		RunString(script)
+
+		ENT.Spawnable = true
+		ENT.AdminSpawnable = true
+
 		scripted_ents.Register(ENT, classname)
 
 		ENT = nil
@@ -59,6 +63,9 @@ function ExecuteCloudboxPackage(info)
 			Primary = {},
 			Secondary = {}
 		}
+
+		SWEP.Spawnable = true
+		SWEP.AdminSpawnable = true
 
 		RunString(script)
 		weapons.Register(SWEP, classname)
