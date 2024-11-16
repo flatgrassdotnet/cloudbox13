@@ -75,28 +75,6 @@ net.Receive("CloudboxServerDownloadProgress", function()
 		notification.Kill("CloudboxPackageDownload" .. id)
 		timer.Remove("CloudboxNotificationKiller" .. id)
 
-		// if it's not us
-		if ActiveCloudboxDownloads[id]["requester"]:SteamID64() != LocalPlayer():SteamID64() then
-			// unregister
-			ActiveCloudboxDownloads[id] = nil
-		end
+		ActiveCloudboxDownloads[id] = nil
 	end
-end)
-
-net.Receive("CloudboxServerDownloadFinished", function()
-	local id = net.ReadUInt(32)
-
-	local type = ActiveCloudboxDownloads[id]["info"]["type"]
-	local classname = "toybox_" .. id
-
-	if type == "weapon" then
-		RunConsoleCommand("gm_giveswep", classname)
-	elseif type == "entity" then
-		RunConsoleCommand("gm_spawnsent", classname)
-	end
-
-	surface.PlaySound("ui/buttonclickrelease.wav")
-
-	// unregister
-	ActiveCloudboxDownloads[id] = nil
 end)
