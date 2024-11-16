@@ -17,102 +17,27 @@
 */
 
 if SERVER then
-	// client
-	util.AddNetworkString("CloudboxClientDownloadRequest")
-	util.AddNetworkString("CloudboxClientDownloadFinished")
-
 	// server
-	util.AddNetworkString("CloudboxServerDownloadRequest")
-	util.AddNetworkString("CloudboxServerDownloadProgress")
-	util.AddNetworkString("CloudboxServerDownloadFinished")
+	include("cloudbox/server/commands.lua")
+	include("cloudbox/server/request.lua")
+
+	// client
+	AddCSLuaFile("cloudbox/client/commands.lua")
+	AddCSLuaFile("cloudbox/client/joinmessage.lua")
+	AddCSLuaFile("cloudbox/client/request.lua")
+	AddCSLuaFile("cloudbox/client/spawnmenu.lua")
+
+	// shared
+	AddCSLuaFile("cloudbox/shared/cloudbox.lua")
+	AddCSLuaFile("cloudbox/shared/compatibility.lua")
 end
 
-if !file.IsDir("cloudbox", "DATA") then
-	file.CreateDir("cloudbox")
+if CLIENT then
+	include("cloudbox/client/commands.lua")
+	include("cloudbox/client/joinmessage.lua")
+	include("cloudbox/client/request.lua")
+	include("cloudbox/client/spawnmenu.lua")
 end
 
-if !file.IsDir("cloudbox/downloads", "DATA") then
-	file.CreateDir("cloudbox/downloads")
-end
-
-function ExecuteCloudboxPackage(info)
-	// if there's a script then decode it
-	local script = ""
-	if info["data"] then
-		script = gm13ize(util.Base64Decode(info["data"]))
-	end
-
-	// execute script / change map
-	local classname = "toybox_" .. info["id"]
-
-	if ActiveCloudboxDownloads[info["id"]]["isInclude"] then
-		RunString(script)
-	elseif info["type"] == "entity" then
-		ENT = {}
-
-		RunString(script)
-
-		ENT.Spawnable = true
-		ENT.AdminSpawnable = true
-
-		scripted_ents.Register(ENT, classname)
-
-		ENT = nil
-	elseif info["type"] == "weapon" then
-		SWEP = {
-			Primary = {},
-			Secondary = {}
-		}
-
-		SWEP.Spawnable = true
-		SWEP.AdminSpawnable = true
-
-		RunString(script)
-		weapons.Register(SWEP, classname)
-
-		SWEP = nil
-	elseif info["type"] == "map" then
-		if SERVER then
-			local split = string.Split(info["name"], ".")
-			RunConsoleCommand("changelevel", split[1])
-		end
-	end
-
-	if CLIENT then
-		// tell server we have it downloaded
-		net.Start("CloudboxClientDownloadFinished")
-		net.WriteUInt(info["id"], 32)
-		net.SendToServer()
-	else // server
-		// tell requester everyone has it downloaded
-		net.Start("CloudboxServerDownloadFinished")
-		net.WriteUInt(info["id"], 32)
-		net.Send(ActiveCloudboxDownloads[info["id"]]["requester"])
-
-		ActiveCloudboxDownloads[info["id"]] = nil
-	end
-end
-
-function MountCloudboxPackage(info)
-	// if client and package has no content then execute the script now
-	if CLIENT and !info["content"] then ExecuteCloudboxPackage(info) return end
-
-	// mount content, downloading first if needed
-	local path = "cloudbox/downloads/" .. info["id"] .. "r" .. info["rev"] .. ".gma"
-	if file.Exists(path, "DATA") then // if we have the package content locally then load it
-		game.MountGMA("data/" .. path)
-		if CLIENT then ExecuteCloudboxPackage(info) end
-	else // otherwise get it from cloudbox
-		local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. info["id"] .. "&rev=" .. info["rev"]
-		http.Fetch(url, function(body, size)
-			if size > 0 then
-				file.Write(path, body) // write to disk
-				game.MountGMA("data/" .. path)
-				if CLIENT then ExecuteCloudboxPackage(info) end
-			end
-		end)
-	end
-end
-
-CreateConVar("cloudbox_userchangelevel", "0", {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, "Allow non-admins to changelevel to Cloudbox maps", 0, 1)
-CreateConVar("cloudbox_adminonly", "0", {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, "Only allow admins to download from Cloudbox", 0, 1)
+include("cloudbox/shared/cloudbox.lua")
+include("cloudbox/shared/compatibility.lua")
