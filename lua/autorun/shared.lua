@@ -24,6 +24,7 @@ if SERVER then
 	// server
 	util.AddNetworkString("CloudboxServerDownloadRequest")
 	util.AddNetworkString("CloudboxServerDownloadProgress")
+	util.AddNetworkString("CloudboxServerDownloadFinished")
 end
 
 if !file.IsDir("cloudbox", "DATA") then
@@ -44,7 +45,7 @@ function ExecuteCloudboxPackage(info)
 	// execute script / change map
 	local classname = "toybox_" .. info["id"]
 
-	if SERVER and ActiveCloudboxDownloads[info["id"]]["isInclude"] then
+	if ActiveCloudboxDownloads[info["id"]]["isInclude"] then
 		RunString(script)
 	elseif info["type"] == "entity" then
 		ENT = {}
@@ -76,7 +77,10 @@ function ExecuteCloudboxPackage(info)
 		net.WriteUInt(info["id"], 32)
 		net.SendToServer()
 	else // server
-		ActiveCloudboxDownloads[info["id"]]["requester"]:Give(classname)
+		// tell requester everyone has it downloaded
+		net.Start("CloudboxServerDownloadFinished")
+		net.WriteUInt(info["id"], 32)
+		net.Send(ActiveCloudboxDownloads[info["id"]]["requester"])
 
 		ActiveCloudboxDownloads[info["id"]] = nil
 	end
