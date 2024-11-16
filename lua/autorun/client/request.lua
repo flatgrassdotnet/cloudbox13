@@ -19,9 +19,7 @@
 ActiveCloudboxDownloads = {}
 
 function RequestCloudboxDownload(type, id, rev)
-	// sometimes GetConVar returns nil here
-	local adminonly = GetConVar("cloudbox_adminonly")
-	if adminonly and adminonly:GetBool() and !LocalPlayer():IsAdmin() then
+	if !LocalPlayer():IsAdmin() and GetConVar("cloudbox_adminonly"):GetBool() then
 		notification.AddLegacy("Sorry, you must be an admin to do that!", NOTIFY_ERROR, 3)
 		surface.PlaySound("buttons/button10.wav")
 		return
