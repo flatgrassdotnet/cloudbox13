@@ -36,7 +36,7 @@ function BroadcastCloudboxPackageDownload(info, requester)
 	local data = util.Compress(util.TableToJSON(info))
 
 	net.Start("CloudboxServerDownloadRequest")
-	net.WriteInt(string.len(data), 16)
+	net.WriteUInt(string.len(data), 16)
 	net.WriteData(data)
 	net.WriteString(requester:SteamID64())
 	net.Broadcast()

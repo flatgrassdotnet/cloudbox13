@@ -46,7 +46,7 @@ function RequestCloudboxDownload(type, id, rev)
 end
 
 net.Receive("CloudboxServerDownloadRequest", function()
-	local size = net.ReadInt(16)
+	local size = net.ReadUInt(16)
 	local data = net.ReadData(size)
 	local steamid = net.ReadString()
 
