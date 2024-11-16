@@ -144,5 +144,9 @@ function gm13ize(script)
 	translated, _ = string.gsub(translated, "([%w_%.]+)%s*&%s*([%w_%.]+)%s*([=><]=?)%s*([%w_%.]+)", " bit.band(%1, %2) %3 %4 ")
 	translated, _ = string.gsub(translated, "util%.PointContents%s*%(%s*([%w_%.]+)%s*%)%s*&%s*([%w_%.]+)%s*([=><!]=?)%s*([%w_%.]+)", " bit.band(util.PointContents(%1), %2) %3 %4 ")
 
+	// Force set Spawnable flag
+	translated, _ = string.gsub(translated, "%.Spawnable%s*=%s*false", "%.Spawnable = true")
+	translated, _ = string.gsub(translated, "%.AdminSpawnable%s*=%s*false", "%.AdminSpawnable = true")
+	
 	return translated
 end
