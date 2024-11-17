@@ -110,42 +110,42 @@ end
 
 function gm13ize(script)
 	// "Entity:SetColor and Entity:GetColor now deal with Colors only"
-	local translated, _ = string.gsub(script, ":SetColor%s*%(", ":SetColorCloudbox%(")
+	local translated = string.gsub(script, ":SetColor%s*%(", ":SetColorCloudbox%(")
 
 	// "entity.Classname. Caps is now enforced properly. Use entity.ClassName instead. (N is upper case)"
-	translated, _ = string.gsub(translated, ".Classname", ".ClassName")
+	translated = string.gsub(translated, ".Classname", ".ClassName")
 
 	// "DMultiChoice is replaced by DComboBox"
-	translated, _ = string.gsub(translated, "\"DMultiChoice\"", "\"DComboBox\"")
+	translated = string.gsub(translated, "\"DMultiChoice\"", "\"DComboBox\"")
 
 	// "Angle functions have been unified. Before some were Set/GetAngles and some were Set/GetAngle. Now they're all Set/GetAngles()"
-	translated, _ = string.gsub(translated, ":SetAngle%s*%(", ":SetAngles%(")
-	translated, _ = string.gsub(translated, ":GetAngle%s*%(", ":GetAngles%(")
+	translated = string.gsub(translated, ":SetAngle%s*%(", ":SetAngles%(")
+	translated = string.gsub(translated, ":GetAngle%s*%(", ":GetAngles%(")
 
 	// SetModelScale takes number now, not Vector
-	translated, _ = string.gsub(translated, ":SetModelScale%s*%(", ":SetModelScaleCloudbox%(")
+	translated = string.gsub(translated, ":SetModelScale%s*%(", ":SetModelScaleCloudbox%(")
 
 	// CreateFont takes a table now
-	translated, _ = string.gsub(translated, "surface.CreateFont%s*%(", "CreateFontCloudbox%(")
+	translated = string.gsub(translated, "surface.CreateFont%s*%(", "CreateFontCloudbox%(")
 
 	// Comment out AddCSLuaFile call, we already do this with Cloudbox
-	translated, _ = string.gsub(translated, "AddCSLuaFile%s*%(", "//AddCSLuaFile%(")
+	translated = string.gsub(translated, "AddCSLuaFile%s*%(", "//AddCSLuaFile%(")
 
 	// Use weapon_cs_base_cloudbox for weapon_cs_base
-	translated, _ = string.gsub(translated, "\"weapon_cs_base\"", "\"weapon_cs_base_cloudbox\"")
+	translated = string.gsub(translated, "\"weapon_cs_base\"", "\"weapon_cs_base_cloudbox\"")
 
 	// Use base_vehicle_cloudbox for base_vehicle
-	translated, _ = string.gsub(translated, "\"base_vehicle\"", "\"base_vehicle_cloudbox\"")
+	translated = string.gsub(translated, "\"base_vehicle\"", "\"base_vehicle_cloudbox\"")
 
 	// Experimental fix for bitwise OR
-	translated, _ = string.gsub(translated, "([%u%d])%s*(|)%s*(%u)", "%1 %+ %3")
+	translated = string.gsub(translated, "([%u%d])%s*(|)%s*(%u)", "%1 %+ %3")
 
 	// Experimental fix for bitwise AND (blame Darth for this)
-	translated, _ = string.gsub(translated, "([%w_%.]+)%s*&%s*([%w_%.]+)%s*([=><]=?)%s*([%w_%.]+)", " bit.band(%1, %2) %3 %4 ")
-	translated, _ = string.gsub(translated, "util%.PointContents%s*%(%s*([%w_%.]+)%s*%)%s*&%s*([%w_%.]+)%s*([=><!]=?)%s*([%w_%.]+)", " bit.band(util.PointContents(%1), %2) %3 %4 ")
+	translated = string.gsub(translated, "([%w_%.]+)%s*&%s*([%w_%.]+)%s*([=><]=?)%s*([%w_%.]+)", " bit.band(%1, %2) %3 %4 ")
+	translated = string.gsub(translated, "util%.PointContents%s*%(%s*([%w_%.]+)%s*%)%s*&%s*([%w_%.]+)%s*([=><!]=?)%s*([%w_%.]+)", " bit.band(util.PointContents(%1), %2) %3 %4 ")
 
 	// Fix timers
-	translated, _ = string.gsub(translated, "timer.", "timercb.")
+	translated = string.gsub(translated, "timer.", "timercb.")
 
 	return translated
 end
