@@ -139,5 +139,8 @@ function gm13ize(script)
 	// Fix timers
 	translated = string.gsub(translated, "timer.", "timercb.")
 
+	// Fix file library
+	translated = string.gsub(translated, "file.", "filecb.")
+
 	return translated
 end
