@@ -45,9 +45,7 @@ function ExecuteCloudboxPackage(info)
 	// execute script / change map
 	local classname = "toybox_" .. info["id"]
 
-	if ActiveCloudboxDownloads[info["id"]]["isInclude"] then
-		RunString(script)
-	elseif info["type"] == "entity" then
+	if info["type"] == "entity" then
 		ENT = {}
 
 		RunString(script)
@@ -93,6 +91,7 @@ function ExecuteCloudboxPackage(info)
 		// tell requester everyone has it downloaded
 		net.Start("CloudboxServerDownloadFinished")
 		net.WriteUInt(info["id"], 32)
+		net.WriteBool(ActiveCloudboxDownloads[info["id"]]["isInclude"])
 		net.Send(ActiveCloudboxDownloads[info["id"]]["requester"])
 
 		ActiveCloudboxDownloads[info["id"]] = nil

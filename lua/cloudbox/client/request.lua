@@ -85,8 +85,15 @@ end)
 
 net.Receive("CloudboxServerDownloadFinished", function()
 	local id = net.ReadUInt(32)
+	local inc = net.ReadBool()
 
 	local type = ActiveCloudboxDownloads[id]["info"]["type"]
+
+	// unregister
+	ActiveCloudboxDownloads[id] = nil
+
+	if inc then return end
+
 	local classname = "toybox_" .. id
 
 	if type == "weapon" then
@@ -96,7 +103,4 @@ net.Receive("CloudboxServerDownloadFinished", function()
 	end
 
 	surface.PlaySound("ui/buttonclickrelease.wav")
-
-	// unregister
-	ActiveCloudboxDownloads[id] = nil
 end)
