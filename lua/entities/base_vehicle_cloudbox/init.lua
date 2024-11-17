@@ -18,9 +18,3 @@ function ENT:Initialize()
 	self:SharedInitialize()
 	
 end
-
-
-
-
-
-

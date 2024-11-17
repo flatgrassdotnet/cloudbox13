@@ -144,5 +144,8 @@ function gm13ize(script)
 	translated, _ = string.gsub(translated, "([%w_%.]+)%s*&%s*([%w_%.]+)%s*([=><]=?)%s*([%w_%.]+)", " bit.band(%1, %2) %3 %4 ")
 	translated, _ = string.gsub(translated, "util%.PointContents%s*%(%s*([%w_%.]+)%s*%)%s*&%s*([%w_%.]+)%s*([=><!]=?)%s*([%w_%.]+)", " bit.band(util.PointContents(%1), %2) %3 %4 ")
 
+	// Fix timers
+	translated, _ = string.gsub(translated, "timer.", "timercb.")
+
 	return translated
 end
