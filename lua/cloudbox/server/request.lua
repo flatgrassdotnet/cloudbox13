@@ -81,10 +81,10 @@ function RegisterCloudboxDownload(id, rev, requester, isInclude)
 	else // otherwise get it from cloudbox
 		local url = "https://api.cl0udb0x.com/packages/get?id=" .. id .. "&rev=" .. rev
 		http.Fetch(url, function(body, size)
-			if size > 0 then
-				file.Write(path, body) // write to disk
-				LoadCloudboxPackage(util.JSONToTable(body), requester, isInclude)
-			end
+			if size == 0 then return end // something broke
+
+			file.Write(path, body) // write to disk
+			LoadCloudboxPackage(util.JSONToTable(body), requester, isInclude)
 		end)
 	end
 end
