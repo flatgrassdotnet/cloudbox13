@@ -106,16 +106,29 @@ function MountCloudboxPackage(info)
 	// mount content, downloading first if needed
 	local path = "cloudbox/downloads/" .. info["id"] .. "r" .. info["rev"] .. ".gma"
 	if file.Exists(path, "DATA") then // if we have the package content locally then load it
-		game.MountGMA("data/" .. path)
+		local success = game.MountGMA("data/" .. path)
+		if !success then // delete and reacquire
+			file.Delete(path, "DATA")
+			MountCloudboxPackage(info)
+			return
+		end
+
 		if CLIENT then ExecuteCloudboxPackage(info) end
 	else // otherwise get it from cloudbox
 		local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. info["id"] .. "&rev=" .. info["rev"]
 		http.Fetch(url, function(body, size)
-			if size > 0 then
-				file.Write(path, body) // write to disk
-				game.MountGMA("data/" .. path)
-				if CLIENT then ExecuteCloudboxPackage(info) end
+			if size == 0 then return end // something broke
+
+			file.Write(path, body) // write to disk
+
+			local success = game.MountGMA("data/" .. path)
+			if !success then // delete and reacquire
+				file.Delete(path, "DATA")
+				MountCloudboxPackage(info)
+				return
 			end
+
+			if CLIENT then ExecuteCloudboxPackage(info) end
 		end)
 	end
 end
