@@ -64,10 +64,11 @@ function ExecuteCloudboxPackage(info)
 			Secondary = {}
 		}
 
+		RunString(script)
+
 		SWEP.Spawnable = true
 		SWEP.AdminSpawnable = true
 
-		RunString(script)
 		weapons.Register(SWEP, classname)
 
 		SWEP = nil
