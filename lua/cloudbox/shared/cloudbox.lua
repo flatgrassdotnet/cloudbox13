@@ -74,8 +74,13 @@ function ExecuteCloudboxPackage(info)
 		SWEP = nil
 	elseif info["type"] == "map" then
 		if SERVER then
-			local split = string.Split(info["name"], ".")
-			RunConsoleCommand("changelevel", split[1])
+			local map = ""
+			for _, content in pairs(info["content"]) do
+				_, _, map = string.find(content["path"], "maps/([%w_%.%-]+)%.bsp")
+				if map then break end
+			end
+
+			RunConsoleCommand("changelevel", map)
 		end
 	end
 
