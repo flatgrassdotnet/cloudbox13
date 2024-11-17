@@ -99,7 +99,9 @@ function ExecuteCloudboxPackage(info)
 	end
 end
 
-function MountCloudboxPackage(info)
+function MountCloudboxPackage(info, attempt)
+	attempt = attempt or 1
+
 	// if client and package has no content then execute the script now
 	if CLIENT and !info["content"] then ExecuteCloudboxPackage(info) return end
 
@@ -107,9 +109,11 @@ function MountCloudboxPackage(info)
 	local path = "cloudbox/downloads/" .. info["id"] .. "r" .. info["rev"] .. ".gma"
 	if file.Exists(path, "DATA") then // if we have the package content locally then load it
 		local success = game.MountGMA("data/" .. path)
-		if !success then // delete and reacquire
+		if !success and attempt < 3 then // delete and reacquire
+			attempt = attempt + 1
+
 			file.Delete(path, "DATA")
-			MountCloudboxPackage(info)
+			MountCloudboxPackage(info, attempt)
 			return
 		end
 
@@ -122,9 +126,11 @@ function MountCloudboxPackage(info)
 			file.Write(path, body) // write to disk
 
 			local success = game.MountGMA("data/" .. path)
-			if !success then // delete and reacquire
+			if !success and attempt < 3 then // delete and reacquire
+				attempt = attempt + 1
+
 				file.Delete(path, "DATA")
-				MountCloudboxPackage(info)
+				MountCloudboxPackage(info, attempt)
 				return
 			end
 
