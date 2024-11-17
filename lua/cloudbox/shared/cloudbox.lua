@@ -110,10 +110,8 @@ function MountCloudboxPackage(info, attempt)
 	if file.Exists(path, "DATA") then // if we have the package content locally then load it
 		local success = game.MountGMA("data/" .. path)
 		if !success and attempt < 3 then // delete and reacquire
-			attempt = attempt + 1
-
 			file.Delete(path, "DATA")
-			MountCloudboxPackage(info, attempt)
+			MountCloudboxPackage(info, attempt + 1)
 			return
 		end
 
@@ -127,10 +125,8 @@ function MountCloudboxPackage(info, attempt)
 
 			local success = game.MountGMA("data/" .. path)
 			if !success and attempt < 3 then // delete and reacquire
-				attempt = attempt + 1
-
 				file.Delete(path, "DATA")
-				MountCloudboxPackage(info, attempt)
+				MountCloudboxPackage(info, attempt + 1)
 				return
 			end
 
