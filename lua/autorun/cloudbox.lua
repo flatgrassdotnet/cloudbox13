@@ -30,6 +30,7 @@ if SERVER then
 	// shared
 	AddCSLuaFile("cloudbox/shared/cloudbox.lua")
 	AddCSLuaFile("cloudbox/shared/compatibility/compatibility.lua")
+	AddCSLuaFile("cloudbox/shared/compatibility/setcolor.lua")
 	AddCSLuaFile("cloudbox/shared/compatibility/timer.lua")
 end
 
@@ -42,4 +43,5 @@ end
 
 include("cloudbox/shared/cloudbox.lua")
 include("cloudbox/shared/compatibility/compatibility.lua")
+include("cloudbox/shared/compatibility/setcolor.lua")
 include("cloudbox/shared/compatibility/timer.lua")

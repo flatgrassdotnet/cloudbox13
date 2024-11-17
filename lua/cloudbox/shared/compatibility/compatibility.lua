@@ -79,14 +79,6 @@ mathx = math
 // Player:GetScriptedVehicle is now Player:GetVehicle
 cPlayer.GetScriptedVehicle = cPlayer.GetVehicle
 
-function cEntity:SetColorCloudbox(r, g, b, a)
-	if IsColor(r) then
-		self:SetColor(r)
-	else
-		self:SetColor(Color(r, g, b, a))
-	end
-end
-
 function cEntity:SetModelScaleCloudbox(vector)
 	self:SetLegacyTransform(true)
 
