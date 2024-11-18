@@ -101,6 +101,8 @@ function CreateFontCloudbox(font_name, size, weight, antialiasing, additive, new
 end
 
 function gm13ize(script)
+	script = "local timer = timercb\nlocal file = filecb\n\n" .. script
+
 	// "Entity:SetColor and Entity:GetColor now deal with Colors only"
 	local translated = string.gsub(script, ":SetColor%s*%(", ":SetColorCloudbox%(")
 
@@ -135,12 +137,6 @@ function gm13ize(script)
 	// Experimental fix for bitwise AND (blame Darth for this)
 	translated = string.gsub(translated, "([%w_%.]+)%s*&%s*([%w_%.]+)%s*([=><]=?)%s*([%w_%.]+)", " bit.band(%1, %2) %3 %4 ")
 	translated = string.gsub(translated, "util%.PointContents%s*%(%s*([%w_%.]+)%s*%)%s*&%s*([%w_%.]+)%s*([=><!]=?)%s*([%w_%.]+)", " bit.band(util.PointContents(%1), %2) %3 %4 ")
-
-	// Fix timers
-	translated = string.gsub(translated, "timer.", "timercb.")
-
-	// Fix file library
-	translated = string.gsub(translated, "file.", "filecb.")
 
 	return translated
 end
