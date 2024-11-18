@@ -79,6 +79,9 @@ mathx = math
 // Player:GetScriptedVehicle is now Player:GetVehicle
 cPlayer.GetScriptedVehicle = cPlayer.GetVehicle
 
+// AccessorFuncNW no longer exists. Replace with AccessorFunc. Will work in SP but will not network in MP.
+AccessorFuncNW = AccessorFunc
+
 function cEntity:SetModelScaleCloudbox(vector)
 	self:SetLegacyTransform(true)
 
@@ -98,6 +101,11 @@ function CreateFontCloudbox(font_name, size, weight, antialiasing, additive, new
 		outline = outlined,
 		blur = blursize
 	})
+end
+
+function DrawTexturedRectUVCloudbox(x, y, rectwidth, rectheight, texturewidth, textureheight)
+    local u1, v1 = rectwidth / texturewidth, rectheight / textureheight
+    surface.DrawTexturedRectUV(x, y, rectwidth, rectheight, 0, 0, u1, v1 )
 end
 
 function GetMountedContent()
@@ -157,6 +165,21 @@ function gm13ize(script)
 	// Experimental fix for bitwise AND (blame Darth for this)
 	translated = string.gsub(translated, "([%w_%.]+)%s*&%s*([%w_%.]+)%s*([=><]=?)%s*([%w_%.]+)", " bit.band(%1, %2) %3 %4 ")
 	translated = string.gsub(translated, "util%.PointContents%s*%(%s*([%w_%.]+)%s*%)%s*&%s*([%w_%.]+)%s*([=><!]=?)%s*([%w_%.]+)", " bit.band(util.PointContents(%1), %2) %3 %4 ")
+
+	// Fonts: Use DefaultFixed instead of ConsoleText
+	translated = string.gsub(translated, "\"ConsoleText\"", "\"DefaultFixed\"")
+
+	// surface.DrawTexturedRectUV parameters have changed
+	translated = string.gsub(translated, "surface.DrawTexturedRectUV%s*%(", "DrawTexturedRectUVCloudbox%(")
+
+	// Get a Normalized vector instead of changing it to Normalized
+	translated = string.gsub(translated, ":Normalize%(%)", ":GetNormalized%(%)")
+
+	// Use ACT_GMOD_GESTURE_ITEM_PLACE for ACT_ITEM_PLACE
+	translated = string.gsub(translated, "([,%(])%s*ACT_ITEM_PLACE%s*([,%)])", " %1 ACT_GMOD_GESTURE_ITEM_PLACE %2 ")
+
+	// Fonts: Use Trebuchet18 instead of Trebuchet19
+	translated = string.gsub(translated, "\"Trebuchet19\"", "\"Trebuchet18\"")
 
 	return translated
 end
