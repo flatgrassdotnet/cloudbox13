@@ -187,7 +187,7 @@ function gm13ize(script)
 	script = "local timer = timercb\nlocal file = filecb\n\n" .. script
 
 	for match, replacement in pairs(CloudboxScriptReplacements) do
-		string.gsub(script, match, replacement)
+		script = string.gsub(script, match, replacement)
 	end
 
 	return script
