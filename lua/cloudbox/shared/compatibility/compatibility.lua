@@ -104,8 +104,8 @@ function CreateFontCloudbox(font_name, size, weight, antialiasing, additive, new
 end
 
 function DrawTexturedRectUVCloudbox(x, y, rectwidth, rectheight, texturewidth, textureheight)
-    local u1, v1 = rectwidth / texturewidth, rectheight / textureheight
-    surface.DrawTexturedRectUV(x, y, rectwidth, rectheight, 0, 0, u1, v1 )
+	local u1, v1 = rectwidth / texturewidth, rectheight / textureheight
+	surface.DrawTexturedRectUV(x, y, rectwidth, rectheight, 0, 0, u1, v1 )
 end
 
 function GetMountedContent()
@@ -128,58 +128,67 @@ function GetAddonList()
 	return addons
 end
 
+CloudboxScriptReplacements = {
+	// "Entity:SetColor and Entity:GetColor now deal with Colors only"
+	[":SetColor%s*%("] = ":SetColorCloudbox%(",
+
+	// "entity.Classname. Caps is now enforced properly. Use entity.ClassName instead. (N is upper case)"
+	[".Classname"] = ".ClassName",
+
+	// "DMultiChoice is replaced by DComboBox"
+	["\"DMultiChoice\""] = "\"DComboBox\"",
+
+	// "Angle functions have been unified. Before some were Set/GetAngles and some were Set/GetAngle. Now they're all Set/GetAngles()"
+	[":SetAngle%s*%("] = ":SetAngles%(",
+	[":GetAngle%s*%("] = ":GetAngles%(",
+
+	// SetModelScale takes number now, not Vector
+	[":SetModelScale%s*%("] = ":SetModelScaleCloudbox%(",
+
+	// CreateFont takes a table now
+	["surface.CreateFont%s*%("] = "CreateFontCloudbox%(",
+
+	// Comment out AddCSLuaFile call, we already do this with Cloudbox
+	["AddCSLuaFile%s*%("] = "//AddCSLuaFile%(",
+
+	// Use weapon_cs_base_cloudbox for weapon_cs_base
+	["\"weapon_cs_base\""] = "\"weapon_cs_base_cloudbox\"",
+
+	// Use base_vehicle_cloudbox for base_vehicle
+	["\"base_vehicle\""] = "\"base_vehicle_cloudbox\"",
+
+	// Use base_vehicle_cloudbox for base_vehicle
+	["\"base_vehicle\""] = "\"base_vehicle_cloudbox\"",
+
+	// Experimental fix for bitwise OR
+	["([%u%d])%s*(|)%s*(%u)"] = "%1 %+ %3",
+
+	// Experimental fix for bitwise AND (blame Darth for this)
+	["([%w_%.]+)%s*&%s*([%w_%.]+)%s*([=><]=?)%s*([%w_%.]+)"] = " bit.band(%1, %2) %3 %4 ",
+	["util%.PointContents%s*%(%s*([%w_%.]+)%s*%)%s*&%s*([%w_%.]+)%s*([=><!]=?)%s*([%w_%.]+)"] = " bit.band(util.PointContents(%1), %2) %3 %4 ",
+
+	// Fonts: Use DefaultFixed instead of ConsoleText
+	["\"ConsoleText\""] = "\"DefaultFixed\"",
+
+	// surface.DrawTexturedRectUV parameters have changed
+	["surface.DrawTexturedRectUV%s*%("] = "DrawTexturedRectUVCloudbox%(",
+
+	// Get a Normalized vector instead of changing it to Normalized
+	[":Normalize%(%)"] = ":GetNormalized%(%)",
+
+	// Use ACT_GMOD_GESTURE_ITEM_PLACE for ACT_ITEM_PLACE
+	["([,%(])%s*ACT_ITEM_PLACE%s*([,%)])"] = " %1 ACT_GMOD_GESTURE_ITEM_PLACE %2 ",
+
+	// Fonts: Use Trebuchet18 instead of Trebuchet19
+	["\"Trebuchet19\""] = "\"Trebuchet18\""
+}
+
 function gm13ize(script)
 	script = "local timer = timercb\nlocal file = filecb\n\n" .. script
 
-	// "Entity:SetColor and Entity:GetColor now deal with Colors only"
-	local translated = string.gsub(script, ":SetColor%s*%(", ":SetColorCloudbox%(")
+	for match, replacement in pairs(CloudboxScriptReplacements) do
+		string.gsub(script, match, replacement)
+	end
 
-	// "entity.Classname. Caps is now enforced properly. Use entity.ClassName instead. (N is upper case)"
-	translated = string.gsub(translated, ".Classname", ".ClassName")
-
-	// "DMultiChoice is replaced by DComboBox"
-	translated = string.gsub(translated, "\"DMultiChoice\"", "\"DComboBox\"")
-
-	// "Angle functions have been unified. Before some were Set/GetAngles and some were Set/GetAngle. Now they're all Set/GetAngles()"
-	translated = string.gsub(translated, ":SetAngle%s*%(", ":SetAngles%(")
-	translated = string.gsub(translated, ":GetAngle%s*%(", ":GetAngles%(")
-
-	// SetModelScale takes number now, not Vector
-	translated = string.gsub(translated, ":SetModelScale%s*%(", ":SetModelScaleCloudbox%(")
-
-	// CreateFont takes a table now
-	translated = string.gsub(translated, "surface.CreateFont%s*%(", "CreateFontCloudbox%(")
-
-	// Comment out AddCSLuaFile call, we already do this with Cloudbox
-	translated = string.gsub(translated, "AddCSLuaFile%s*%(", "//AddCSLuaFile%(")
-
-	// Use weapon_cs_base_cloudbox for weapon_cs_base
-	translated = string.gsub(translated, "\"weapon_cs_base\"", "\"weapon_cs_base_cloudbox\"")
-
-	// Use base_vehicle_cloudbox for base_vehicle
-	translated = string.gsub(translated, "\"base_vehicle\"", "\"base_vehicle_cloudbox\"")
-
-	// Experimental fix for bitwise OR
-	translated = string.gsub(translated, "([%u%d])%s*(|)%s*(%u)", "%1 %+ %3")
-
-	// Experimental fix for bitwise AND (blame Darth for this)
-	translated = string.gsub(translated, "([%w_%.]+)%s*&%s*([%w_%.]+)%s*([=><]=?)%s*([%w_%.]+)", " bit.band(%1, %2) %3 %4 ")
-	translated = string.gsub(translated, "util%.PointContents%s*%(%s*([%w_%.]+)%s*%)%s*&%s*([%w_%.]+)%s*([=><!]=?)%s*([%w_%.]+)", " bit.band(util.PointContents(%1), %2) %3 %4 ")
-
-	// Fonts: Use DefaultFixed instead of ConsoleText
-	translated = string.gsub(translated, "\"ConsoleText\"", "\"DefaultFixed\"")
-
-	// surface.DrawTexturedRectUV parameters have changed
-	translated = string.gsub(translated, "surface.DrawTexturedRectUV%s*%(", "DrawTexturedRectUVCloudbox%(")
-
-	// Get a Normalized vector instead of changing it to Normalized
-	translated = string.gsub(translated, ":Normalize%(%)", ":GetNormalized%(%)")
-
-	// Use ACT_GMOD_GESTURE_ITEM_PLACE for ACT_ITEM_PLACE
-	translated = string.gsub(translated, "([,%(])%s*ACT_ITEM_PLACE%s*([,%)])", " %1 ACT_GMOD_GESTURE_ITEM_PLACE %2 ")
-
-	// Fonts: Use Trebuchet18 instead of Trebuchet19
-	translated = string.gsub(translated, "\"Trebuchet19\"", "\"Trebuchet18\"")
-
-	return translated
+	return script
 end
