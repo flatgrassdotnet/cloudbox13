@@ -100,6 +100,16 @@ function CreateFontCloudbox(font_name, size, weight, antialiasing, additive, new
 	})
 end
 
+function GetMountedContent()
+	local games = {}
+
+	for _, v in pairs(engine.GetGames()) do
+		if v["mounted"] then games[v["title"]] = v["folder"] end
+	end
+
+	return games
+end
+
 function gm13ize(script)
 	script = "local timer = timercb\nlocal file = filecb\n\n" .. script
 
