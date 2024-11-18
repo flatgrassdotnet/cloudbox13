@@ -110,6 +110,16 @@ function GetMountedContent()
 	return games
 end
 
+function GetAddonList()
+	local addons = {}
+
+	for _, v in pairs(engine.GetAddons()) do
+		if v["mounted"] then table.insert(addons, v["title"]) end // probably not correct
+	end
+
+	return addons
+end
+
 function gm13ize(script)
 	script = "local timer = timercb\nlocal file = filecb\n\n" .. script
 
