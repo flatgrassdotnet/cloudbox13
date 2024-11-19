@@ -17,6 +17,7 @@
 */
 
 local file = file
+local string = string
 
 module("filecb")
 
@@ -28,20 +29,39 @@ function Delete(filename) return file.Delete(filename, "DATA") end
 
 function Exists(filename, usebasefolder)
 	local path = "DATA" if usebasefolder then path = "GAME" end
-	return file.Exists(filename, path)
+	local ex = file.Exists(filename, path)
+	if not ex and string.EndsWith(filename, ".wav") then // TF2 fix
+		ex = Exists(string.Replace(filename, ".wav", ".mp3"), usebasefolder)
+	end
+
+	return ex
 end
 
 function ExistsEx(filename, addons) return file.Exists(filename, "DATA") end
 
+local function FindCommon(filename, usebasefolder, dir)
+	local path = "DATA"
+	if usebasefolder then
+		path = "GAME"
+	elseif string.StartsWith(filename, "../") then
+		filename = string.sub(filename, 4)
+		path = "GAME"
+	end
+
+	local files, dirs = file.Find(filename, path)
+	if not dir and files == nil and string.EndsWith(filename, ".wav") then // TF2 fix
+		files = FindCommon(string.Replace(filename, ".wav", ".mp3"), usebasefolder, false)
+	end
+
+	if dir then return dirs else return files end
+end
+
 function Find(filename, usebasefolder)
-	local path = "DATA" if usebasefolder then path = "GAME" end
-	return file.Find(filename, path)
+	return FindCommon(filename, usebasefolder, false)
 end
 
 function FindDir(dirname, usebasefolder)
-	local path = "DATA" if usebasefolder then path = "GAME" end
-	local _, dirs = file.Find(dirname, path)
-	return dirs
+	return FindCommon(dirname, usebasefolder, true)
 end
 
 function FindInLua(filename) return file.Find(filename, "LUA") end

@@ -82,12 +82,42 @@ cPlayer.GetScriptedVehicle = cPlayer.GetVehicle
 // AccessorFuncNW no longer exists. Replace with AccessorFunc. Will work in SP but will not network in MP.
 AccessorFuncNW = AccessorFunc
 
+function cPlayer:GetInfoNumCloudbox(cVarName, default)
+	default = default or 0
+
+	self:GetInfoNum(cVarName, default)
+end
+
+function cPlayer:SetFOVCloudbox(fov, ...)
+	fov = fov or 0
+
+	self:SetFOV(fov, ...)
+end
+
 function cEntity:SetModelScaleCloudbox(vector)
 	self:SetLegacyTransform(true)
 
 	local x, y, z = vector:Unpack()
 
 	self:SetModelScale((x + y + z) / 3)
+end
+
+function cEntity:EmitSoundCloudbox(soundName, ...)
+	// TF2 Fix
+	if string.EndsWith(soundName, ".wav") and not file.Exists("sound/" .. soundName, "GAME") and file.Exists("sound/" .. string.Replace(soundName, ".wav", ".mp3"), "GAME") then
+		soundName = string.Replace(soundName, ".wav", ".mp3")
+	end
+
+	self:EmitSound(soundName, ...)
+end
+
+function EmitSoundCloudbox(soundName, ...)
+	// TF2 Fix
+	if string.EndsWith(soundName, ".wav") and not file.Exists("sound/" .. soundName, "GAME") and file.Exists("sound/" .. string.Replace(soundName, ".wav", ".mp3"), "GAME") then
+		soundName = string.Replace(soundName, ".wav", ".mp3")
+	end
+
+	EmitSound(soundName, ...)
 end
 
 function CreateFontCloudbox(font_name, size, weight, antialiasing, additive, new_font_name, drop_shadow, outlined, blur)
@@ -133,7 +163,7 @@ CloudboxScriptReplacements = {
 	[":SetColor%s*%("] = ":SetColorCloudbox%(",
 
 	// "entity.Classname. Caps is now enforced properly. Use entity.ClassName instead. (N is upper case)"
-	[".Classname"] = ".ClassName",
+	["%.Classname"] = ".ClassName",
 
 	// "DMultiChoice is replaced by DComboBox"
 	["\"DMultiChoice\""] = "\"DComboBox\"",
@@ -179,8 +209,22 @@ CloudboxScriptReplacements = {
 	// Use ACT_GMOD_GESTURE_ITEM_PLACE for ACT_ITEM_PLACE
 	["([,%(])%s*ACT_ITEM_PLACE%s*([,%)])"] = " %1 ACT_GMOD_GESTURE_ITEM_PLACE %2 ",
 
+	// Update FVPHYSICS enums
+	["([,%(])%s*NO_SELF_COLLISIONS%s*([,%)])"] = " %1 FVPHYSICS_NO_SELF_COLLISIONS %2 ",
+	["([,%(])%s*HEAVY_OBJECT%s*([,%)])"] = " %1 FVPHYSICS_HEAVY_OBJECT %2 ",
+
 	// Fonts: Use Trebuchet18 instead of Trebuchet19
-	["\"Trebuchet19\""] = "\"Trebuchet18\""
+	["\"Trebuchet19\""] = "\"Trebuchet18\"",
+
+	// EmitSound fix for TF2
+	[":EmitSound%s*%("] = ":EmitSoundCloudbox%(",
+	["EmitSound%s*%("] = "EmitSoundCloudbox%(",
+
+	// Fix GetInfoNum not providing a default
+	[":GetInfoNum%s*%("] = ":GetInfoNumCloudbox%(",
+
+	// SetFOV can't be nil
+	[":SetFOV%s*%("] = ":SetFOVCloudbox%("
 }
 
 function gm13ize(script)
