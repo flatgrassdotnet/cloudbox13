@@ -31,7 +31,7 @@ function RequestCloudboxDownload(type, id, rev)
 		return
 	end
 
-	if type == "map" and !GetConVar("cloudbox_userchangelevel"):GetBool() and !LocalPlayer():IsAdmin() then
+	if type == "map" and !LocalPlayer():IsAdmin() and !GetConVar("cloudbox_userchangelevel"):GetBool() then
 		notification.AddLegacy("Sorry, you must be an admin to do that!", NOTIFY_ERROR, 3)
 		surface.PlaySound("buttons/button10.wav")
 		return
@@ -71,15 +71,15 @@ net.Receive("CloudboxServerDownloadProgress", function()
 
 	notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading \"" .. ActiveCloudboxDownloads[id]["info"]["name"] .. "\"", progress)
 
-	if progress == 1 then
-		notification.Kill("CloudboxPackageDownload" .. id)
-		timer.Remove("CloudboxNotificationKiller" .. id)
+	if progress != 1 then return end
 
-		// if it's not us
-		if ActiveCloudboxDownloads[id]["requester"]:SteamID64() != LocalPlayer():SteamID64() then
-			// unregister
-			ActiveCloudboxDownloads[id] = nil
-		end
+	notification.Kill("CloudboxPackageDownload" .. id)
+	timer.Remove("CloudboxNotificationKiller" .. id)
+
+	// if it's not us
+	if ActiveCloudboxDownloads[id]["requester"]:SteamID64() != LocalPlayer():SteamID64() then
+		// unregister
+		ActiveCloudboxDownloads[id] = nil
 	end
 end)
 
