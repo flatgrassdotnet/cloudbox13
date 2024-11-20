@@ -89,10 +89,7 @@ net.Receive("CloudboxServerDownloadFinished", function()
 
 	local type = ActiveCloudboxDownloads[id]["info"]["type"]
 
-	// unregister
-	ActiveCloudboxDownloads[id] = nil
-
-	if inc then return end
+	if inc then ActiveCloudboxDownloads[id] = nil return end
 
 	local classname = "toybox_" .. id
 
@@ -100,7 +97,12 @@ net.Receive("CloudboxServerDownloadFinished", function()
 		RunConsoleCommand("gm_giveswep", classname)
 	elseif type == "entity" then
 		RunConsoleCommand("gm_spawnsent", classname)
+	elseif type == "prop" then
+		RunConsoleCommand("gm_spawn", ActiveCloudboxDownloads[id]["dataname"])
 	end
+
+	// unregister
+	ActiveCloudboxDownloads[id] = nil
 
 	surface.PlaySound("ui/buttonclickrelease.wav")
 end)
