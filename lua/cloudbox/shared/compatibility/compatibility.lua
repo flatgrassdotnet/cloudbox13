@@ -19,6 +19,7 @@
 local cEntity = FindMetaTable("Entity")
 local cIMaterial = FindMetaTable("IMaterial")
 local cPlayer = FindMetaTable("Player")
+local cWeapon = FindMetaTable("Weapon")
 
 // "KeyValuesToTable and TableToKeyValues are now in the util library"
 KeyValuesToTable = util.KeyValuesToTable
@@ -158,6 +159,18 @@ function GetAddonList()
 	return addons
 end
 
+function cPlayer:ViewPunchCloudbox(ang)
+	if isangle(ang) then self:ViewPunch(ang) return end
+
+	local x, y, z = ang:Unpack()
+
+	self:ViewPunch(Angle(x, y, z))
+end
+
+function cWeapon:DefaultReloadCloudbox(act)
+	return self:DefaultReload(act or ACT_VM_RELOAD)
+end
+
 CloudboxScriptReplacements = {
 	// "Entity:SetColor and Entity:GetColor now deal with Colors only"
 	[":SetColor%s*%("] = ":SetColorCloudbox%(",
@@ -224,7 +237,13 @@ CloudboxScriptReplacements = {
 	[":GetInfoNum%s*%("] = ":GetInfoNumCloudbox%(",
 
 	// SetFOV can't be nil
-	[":SetFOV%s*%("] = ":SetFOVCloudbox%("
+	[":SetFOV%s*%("] = ":SetFOVCloudbox%(",
+
+	// ViewPunch takes Angle now
+	[":ViewPunch%s*%("] = ":ViewPunchCloudbox%(",
+
+	// DefaultReload arg is not optional now
+	[":DefaultReload%s*%("] = ":DefaultReloadCloudbox%("
 }
 
 function gm13ize(script)
