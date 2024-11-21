@@ -35,7 +35,7 @@ function AddCloudboxTab()
 	end
 
 	html:Dock(FILL)
-	html:OpenURL("https://ingame.cl0udb0x.com")
+	html:OpenURL("https://safe.cl0udb0x.com")
 	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
 	html:AddFunction("cloudbox", "SetFocused", CloudboxFocus)
 
