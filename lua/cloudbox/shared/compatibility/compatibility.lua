@@ -246,6 +246,9 @@ CloudboxScriptReplacements = {
 	[":DefaultReload%s*%("] = ":DefaultReloadCloudbox%("
 }
 
+// "stopsounds" is now "stopsound"
+concommand.Add("stopsounds", function() RunConsoleCommand("stopsound") end)
+
 function gm13ize(script)
 	script = "local timer = timercb\nlocal file = filecb\n\n" .. script
 
