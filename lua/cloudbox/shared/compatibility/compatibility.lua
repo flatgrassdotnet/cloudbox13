@@ -20,6 +20,7 @@ local cEntity = FindMetaTable("Entity")
 local cIMaterial = FindMetaTable("IMaterial")
 local cPlayer = FindMetaTable("Player")
 local cWeapon = FindMetaTable("Weapon")
+local cParticle = FindMetaTable("CLuaParticle")
 
 // "KeyValuesToTable and TableToKeyValues are now in the util library"
 KeyValuesToTable = util.KeyValuesToTable
@@ -83,10 +84,15 @@ cPlayer.GetScriptedVehicle = cPlayer.GetVehicle
 // AccessorFuncNW no longer exists. Replace with AccessorFunc. Will work in SP but will not network in MP.
 AccessorFuncNW = AccessorFunc
 
+// VelocityDecay no longer exists and has no replacement. Just prevent it erroring.
+if CLIENT then
+	function cParticle:VelocityDecay(...) end
+end
+
 function cPlayer:GetInfoNumCloudbox(cVarName, default)
 	default = default or 0
 
-	self:GetInfoNum(cVarName, default)
+	return self:GetInfoNum(cVarName, default)
 end
 
 function cPlayer:SetFOVCloudbox(fov, ...)
@@ -171,9 +177,18 @@ function cWeapon:DefaultReloadCloudbox(act)
 	return self:DefaultReload(act or ACT_VM_RELOAD)
 end
 
+function HookAddCloudbox(eventName, identifier, func)
+	// Some scripts incorrectly use numbers
+	if isnumber(identifier) then identifier = tostring(identifier) end
+	hook.Add(eventName, identifier, func)
+end
+
 CloudboxScriptReplacements = {
 	// "Entity:SetColor and Entity:GetColor now deal with Colors only"
 	[":SetColor%s*%("] = ":SetColorCloudbox%(",
+
+	// GetColor only returns the Color now. Some scripts require it split. Hacky fix.
+	["local r,%s*g,%s*b,%s*a%s*=%s*self:GetColor%(%)"] = "local r, g, b, a = self:GetColor%(%):Unpack%(%)",
 
 	// "entity.Classname. Caps is now enforced properly. Use entity.ClassName instead. (N is upper case)"
 	["%.Classname"] = ".ClassName",
@@ -213,6 +228,15 @@ CloudboxScriptReplacements = {
 	// Fonts: Use DefaultFixed instead of ConsoleText
 	["\"ConsoleText\""] = "\"DefaultFixed\"",
 
+	// Fonts: Use Trebuchet18 instead of Trebuchet19
+	["\"Trebuchet19\""] = "\"Trebuchet18\"",
+
+	// Fonts: Use CloseCaption_Bold instead of HUDNumber5
+	["\"HUDNumber5\""] = "\"CloseCaption_Bold\"",
+
+	// Fonts: Use HudSelectionText instead of MenuLarge
+	["\"MenuLarge\""] = "\"HudSelectionText\"",
+
 	// surface.DrawTexturedRectUV parameters have changed
 	["surface.DrawTexturedRectUV%s*%("] = "DrawTexturedRectUVCloudbox%(",
 
@@ -225,9 +249,6 @@ CloudboxScriptReplacements = {
 	// Update FVPHYSICS enums
 	["([,%(])%s*NO_SELF_COLLISIONS%s*([,%)])"] = " %1 FVPHYSICS_NO_SELF_COLLISIONS %2 ",
 	["([,%(])%s*HEAVY_OBJECT%s*([,%)])"] = " %1 FVPHYSICS_HEAVY_OBJECT %2 ",
-
-	// Fonts: Use Trebuchet18 instead of Trebuchet19
-	["\"Trebuchet19\""] = "\"Trebuchet18\"",
 
 	// EmitSound fix for TF2
 	[":EmitSound%s*%("] = ":EmitSoundCloudbox%(",
@@ -243,7 +264,13 @@ CloudboxScriptReplacements = {
 	[":ViewPunch%s*%("] = ":ViewPunchCloudbox%(",
 
 	// DefaultReload arg is not optional now
-	[":DefaultReload%s*%("] = ":DefaultReloadCloudbox%("
+	[":DefaultReload%s*%("] = ":DefaultReloadCloudbox%(",
+
+	// Fix incorrect coding, passing Angle into SetPos when it needs to be Vector
+	[":SetPos%s*%(%s*Angle%s*%("] = ":SetPos%(Vector%(",
+
+	// Some scripts incorrectly use numbers as an identifier. Intercept the .Add to fix it.
+	["hook%.Add%s*%("] = "HookAddCloudbox%("
 }
 
 // "stopsounds" is now "stopsound"
