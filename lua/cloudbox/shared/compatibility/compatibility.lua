@@ -186,7 +186,7 @@ end
 CloudboxScriptReplacements = {
 	// "Entity:SetColor and Entity:GetColor now deal with Colors only"
 	[":SetColor%s*%("] = ":SetColorCloudbox%(",
-
+	
 	// GetColor only returns the Color now. Some scripts require it split. Hacky fix.
 	["local r,%s*g,%s*b,%s*a%s*=%s*self:GetColor%(%)"] = "local r, g, b, a = self:GetColor%(%):Unpack%(%)",
 
@@ -225,17 +225,12 @@ CloudboxScriptReplacements = {
 	["([%w_%.]+)%s*&%s*([%w_%.]+)%s*([=><]=?)%s*([%w_%.]+)"] = " bit.band(%1, %2) %3 %4 ",
 	["util%.PointContents%s*%(%s*([%w_%.]+)%s*%)%s*&%s*([%w_%.]+)%s*([=><!]=?)%s*([%w_%.]+)"] = " bit.band(util.PointContents(%1), %2) %3 %4 ",
 
-	// Fonts: Use DefaultFixed instead of ConsoleText
+	// Fonts
 	["\"ConsoleText\""] = "\"DefaultFixed\"",
-
-	// Fonts: Use Trebuchet18 instead of Trebuchet19
 	["\"Trebuchet19\""] = "\"Trebuchet18\"",
-
-	// Fonts: Use CloseCaption_Bold instead of HUDNumber5
 	["\"HUDNumber5\""] = "\"CloseCaption_Bold\"",
-
-	// Fonts: Use HudSelectionText instead of MenuLarge
 	["\"MenuLarge\""] = "\"HudSelectionText\"",
+	["\"ScoreboardText\""] = "\"ScoreboardDefault\"",
 
 	// surface.DrawTexturedRectUV parameters have changed
 	["surface.DrawTexturedRectUV%s*%("] = "DrawTexturedRectUVCloudbox%(",
@@ -249,6 +244,12 @@ CloudboxScriptReplacements = {
 	// Update FVPHYSICS enums
 	["([,%(])%s*NO_SELF_COLLISIONS%s*([,%)])"] = " %1 FVPHYSICS_NO_SELF_COLLISIONS %2 ",
 	["([,%(])%s*HEAVY_OBJECT%s*([,%)])"] = " %1 FVPHYSICS_HEAVY_OBJECT %2 ",
+	
+	// Update DMG enums
+	["([,%(])%s*DMG_FIRE%s*([,%)])"] = " %1 DMG_BURN %2 ",
+	
+	// Update RENDERGROUP enums
+	["([,%(])%s*RENDER_GROUP_VIEW_MODEL_OPAQUE%s*([,%)])"] = " %1 RENDERGROUP_VIEWMODEL %2 ",
 
 	// EmitSound fix for TF2
 	[":EmitSound%s*%("] = ":EmitSoundCloudbox%(",
@@ -265,12 +266,19 @@ CloudboxScriptReplacements = {
 
 	// DefaultReload arg is not optional now
 	[":DefaultReload%s*%("] = ":DefaultReloadCloudbox%(",
-
-	// Fix incorrect coding, passing Angle into SetPos when it needs to be Vector
+	
+	// Fix incorrect(?) coding, passing Angle into certain things when it needs to be Vector
 	[":SetPos%s*%(%s*Angle%s*%("] = ":SetPos%(Vector%(",
-
+	[":AddAngleVelocity%s*%(%s*Angle%s*%("] = ":AddAngleVelocity%(Vector%(",
+	
 	// Some scripts incorrectly use numbers as an identifier. Intercept the .Add to fix it.
-	["hook%.Add%s*%("] = "HookAddCloudbox%("
+	["hook%.Add%s*%("] = "HookAddCloudbox%(",
+	
+	// TF2 Models
+	["\"models/items/tf/plate%.mdl\""] = "\"models/items/plate.mdl\"",
+	
+	// SetMaterial doesn't take a Material object
+	[":SetMaterial%s*%(%s*Material%s*%(%s*\"([%w_/]+)\"%s*%)%s*%)"] = ":SetMaterial%( \"%1\" %)"
 }
 
 // "stopsounds" is now "stopsound"
