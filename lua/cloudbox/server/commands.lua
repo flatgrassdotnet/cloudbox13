@@ -16,7 +16,9 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-concommand.Add("cloudbox_purgecache", function()
+concommand.Add("sv_cloudbox_purgecache", function(ply)
+	if ply and !ply:IsAdmin() then return end
+
 	files = file.Find("cloudbox/downloads/*", "DATA")
 	for _, filename in pairs(files) do
 		file.Delete("cloudbox/downloads/" .. filename, "DATA")

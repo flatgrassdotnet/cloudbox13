@@ -29,3 +29,10 @@ concommand.Add("cloudbox_getpackage", function(_, _, args)
 
 	RequestCloudboxDownload("", args[1], args[2])
 end, nil, "Download a package from Cloudbox by ID and (optionally) revision")
+
+concommand.Add("cloudbox_purgecache", function()
+	files = file.Find("cloudbox/downloads/*", "DATA")
+	for _, filename in pairs(files) do
+		file.Delete("cloudbox/downloads/" .. filename, "DATA")
+	end
+end, nil, "Purge the Cloudbox downloads cache")
