@@ -37,8 +37,6 @@ function RequestCloudboxDownload(type, id, rev)
 		return
 	end
 
-	surface.PlaySound("garrysmod/content_downloaded.wav")
-
 	net.Start("CloudboxClientDownloadRequest")
 	net.WriteUInt(id, 32)
 	net.WriteUInt(rev, 32)

@@ -116,6 +116,9 @@ function MountCloudboxPackage(info, attempt)
 
 		if CLIENT then ExecuteCloudboxPackage(info) end
 	else // otherwise get it from cloudbox
+		// add stuff to download indicator
+		if CLIENT and info["content"] then for k, v in pairs(info["content"]) do UpdatePackageDownloadStatus(v["id"], v["path"], 0, "downloading", v["size"]) end end
+
 		local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. info["id"] .. "&rev=" .. info["rev"]
 		http.Fetch(url, function(body, size)
 			if size == 0 then return end // something broke
@@ -129,7 +132,17 @@ function MountCloudboxPackage(info, attempt)
 				return
 			end
 
-			if CLIENT then ExecuteCloudboxPackage(info) end
+			if !CLIENT then return end // client only after this
+
+			// show download animation finishing
+			timer.Create("CloudboxDownloadSimulator", math.Rand(0.05, 0.2), #Downloads, function()
+				// randomness
+				timer.Adjust("CloudboxDownloadSimulator", math.Rand(0.05, 0.2))
+
+				for id, dl in pairs(Downloads) do UpdatePackageDownloadStatus(id, dl.name, 1, "success", dl.size) break end
+
+				if table.IsEmpty(Downloads) then ExecuteCloudboxPackage(info) return end
+			end)
 		end)
 	end
 end

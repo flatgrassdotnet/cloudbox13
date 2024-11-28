@@ -27,6 +27,10 @@ if SERVER then
 	AddCSLuaFile("cloudbox/client/request.lua")
 	AddCSLuaFile("cloudbox/client/spawnmenu.lua")
 
+	AddCSLuaFile("cloudbox/client/content_downloads.lua")
+	AddCSLuaFile("cloudbox/client/content_main.lua")
+	AddCSLuaFile("cloudbox/client/content_vgui.lua")
+
 	// shared
 	AddCSLuaFile("cloudbox/shared/cloudbox.lua")
 	AddCSLuaFile("cloudbox/shared/compatibility/compatibility.lua")
@@ -40,6 +44,10 @@ if CLIENT then
 	include("cloudbox/client/joinmessage.lua")
 	include("cloudbox/client/request.lua")
 	include("cloudbox/client/spawnmenu.lua")
+
+	include("cloudbox/client/content_downloads.lua")
+	include("cloudbox/client/content_main.lua")
+	include("cloudbox/client/content_vgui.lua")
 end
 
 include("cloudbox/shared/cloudbox.lua")
