@@ -22,35 +22,35 @@ function PANEL:Init()
 	self:SetSize(24, 24)
 	self:NoClipping(true)
 
-	self.imgPanel = vgui.Create("DImage", self);
-	self.imgPanel:SetImage("icon16/weather_clouds.png");
-	self.imgPanel:SetSize( 16, 16 )
-	self.imgPanel:SetPos( 4, 4 )
+	self.imgPanel = vgui.Create("DImage", self)
+	self.imgPanel:SetImage("icon16/weather_clouds.png")
+	self.imgPanel:SetSize(16, 16)
+	self.imgPanel:SetPos(4, 4)
 
-	self.imgPanel:SetAlpha( 30 )
+	self.imgPanel:SetAlpha(30)
 
 	self.BoxW = 0
 	self.BoxH = 0
 end
 
 function PANEL:SetUp(name)
-	local ext = string.GetExtensionFromFilename(name);
+	local ext = string.GetExtensionFromFilename(name)
 
 	if ext == "vmt" then
-		self.imgPanel:SetImage("icon16/page.png");
+		self.imgPanel:SetImage("icon16/page.png")
 	elseif ext == "vtf" then
-		self.imgPanel:SetImage("icon16/palette.png");
+		self.imgPanel:SetImage("icon16/palette.png")
 	elseif ext == "mdl" then
-		self.imgPanel:SetImage("icon16/brick_add.png");
+		self.imgPanel:SetImage("icon16/brick_add.png")
 	elseif ext == "wav" then
-		self.imgPanel:SetImage("icon16/sound.png");
+		self.imgPanel:SetImage("icon16/sound.png")
 	end
 
 	self.imgPanel:AlphaTo(255, 0.2, 0)
 end
 
 function PANEL:Update(f, name, size)
-	self.f = f;
+	self.f = f
 	self.size = size
 
 	if self.name != name then
@@ -130,7 +130,7 @@ function PANEL:Bounce()
 end
 
 function PANEL:Failed()
-	self.DownloadFailed = true;
+	self.DownloadFailed = true
 end
 
 vgui.Register("DContentDownload", PANEL, "DPanel")

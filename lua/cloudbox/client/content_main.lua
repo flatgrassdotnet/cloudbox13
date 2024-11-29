@@ -29,7 +29,7 @@ function PANEL:Think()
 
 	/*if self.LastActivity && (SysTime() - self.LastActivity) > 2 then // has a 2 sec timeout before it removes the icons, cloudbox doesn't do progress so this is disabled
 		self:MoveTo(self.x, ScrH() + 5, 0.5, 0.5)
-		self.LastActivity = nil;
+		self.LastActivity = nil
 		self.MaxFileCount = 0
 	end*/
 

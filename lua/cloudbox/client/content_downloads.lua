@@ -34,12 +34,12 @@ function UpdatePackageDownloadStatus(pid, id, name, f, status, size)
 
 	if !dl then
 		dl = vgui.Create("DContentDownload", Main)
-		dl.Velocity = Vector(0, 0, 0);
+		dl.Velocity = Vector(0, 0, 0)
 		//dl:SetAlpha(10) // starts mostly transparent because it's waiting for download progress, we can't do this on cloudbox
 		CloudboxContentDownloads[pid][id] = dl
 	end
 
-	dl:Update(f, name, size);
+	dl:Update(f, name, size)
 
 	if status == "success" then
 		dl:Bounce()
