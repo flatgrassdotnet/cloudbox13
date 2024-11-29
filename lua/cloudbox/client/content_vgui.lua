@@ -33,17 +33,43 @@ function PANEL:Init()
 	self.BoxH = 0
 end
 
+local ExtensionIcons = {
+	["vtf"] = "picture",
+	["vmt"] = "picture_add",
+
+	["mdl"] = "brick",
+	["vtx"] = "brick_add",
+	["vvd"] = "brick_add",
+	["phy"] = "brick_add",
+
+	["wav"] = "sound",
+	["mp3"] = "sound",
+
+	["bsp"] = "world",
+
+	["ain"] = "chart_organisation",
+	["nav"] = "chart_organisation",
+
+	["raw"] = "color_swatch",
+	["pcf"] = "lightning",
+
+	["txt"] = "script"
+}
+
+local HiddenExtensions = {
+	["vmt"] = true,
+
+	["vtx"] = true,
+	["vvd"] = true,
+	["phy"] = true
+}
+
 function PANEL:SetUp(name)
 	local ext = string.GetExtensionFromFilename(name)
 
-	if ext == "vmt" then
-		self.imgPanel:SetImage("icon16/page.png")
-	elseif ext == "vtf" then
-		self.imgPanel:SetImage("icon16/palette.png")
-	elseif ext == "mdl" then
-		self.imgPanel:SetImage("icon16/brick_add.png")
-	elseif ext == "wav" then
-		self.imgPanel:SetImage("icon16/sound.png")
+	local icon = ExtensionIcons[ext]
+	if icon then
+		self.imgPanel:SetImage("icon16/" .. icon .. ".png")
 	end
 
 	self.imgPanel:AlphaTo(255, 0.2, 0)
@@ -101,14 +127,23 @@ function PANEL:Paint()
 	draw.RoundedBox(4, 1, 1, self:GetWide() - 2, self:GetTall() - 2, Color(r, g, b, a * 0.7))
 
 	// If the file is bigger than 3MB, give us some info.
-	if self.f < 1.0 && self.size > (1024 * 1024 * 3) then
-		self:DrawSizeBox(a)
-	end
+	//if self.f < 1.0 && self.size > (1024 * 1024 * 3) then
+	//	self:DrawSizeBox(a)
+	//end
+
+	if !HiddenExtensions[string.GetExtensionFromFilename(self.name)] then self:DrawNameBox(a, self.name) end
 end
 
 function PANEL:DrawSizeBox(a)
 	local x = (self.BoxW - self:GetWide()) * -0.5
 	local txt = math.Round(self.f * 100, 2) .. "% of " .. string.NiceSize(self.size)
+
+	self.BoxW, self.BoxH = draw.WordBox(4, x, self.BoxH * -1.1, txt, "DefaultSmall", Color(50, 55, 60, a * 0.8), Color(255, 255, 255, a))
+end
+
+function PANEL:DrawNameBox(a, name)
+	local x = (self.BoxW - self:GetWide()) * -0.5
+	local txt = string.StripExtension(string.GetFileFromFilename(name))
 
 	self.BoxW, self.BoxH = draw.WordBox(4, x, self.BoxH * -1.1, txt, "DefaultSmall", Color(50, 55, 60, a * 0.8), Color(255, 255, 255, a))
 end

@@ -54,11 +54,13 @@ net.Receive("CloudboxServerDownloadRequest", function()
 	// register
 	ActiveCloudboxDownloads[info["id"]] = {["info"] = info, ["requester"] = requester}
 
-	notification.AddProgress("CloudboxPackageDownload" .. info["id"], "Downloading \"" .. info["name"] .. "\"")
+	if !game.SinglePlayer then
+		notification.AddProgress("CloudboxPackageDownload" .. info["id"], "Downloading \"" .. info["name"] .. "\"")
 
-	timer.Create("CloudboxNotificationKiller" .. info["id"], 30, 1, function()
-		notification.Kill("CloudboxPackageDownload" .. info["id"])
-	end)
+		timer.Create("CloudboxNotificationKiller" .. info["id"], 30, 1, function()
+			notification.Kill("CloudboxPackageDownload" .. info["id"])
+		end)
+	end
 
 	MountCloudboxPackage(info)
 end)
@@ -67,12 +69,16 @@ net.Receive("CloudboxServerDownloadProgress", function()
 	local id = net.ReadUInt(32)
 	local progress = net.ReadFloat()
 
-	notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading \"" .. ActiveCloudboxDownloads[id]["info"]["name"] .. "\"", progress)
+	if !game.SinglePlayer then
+		notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading \"" .. ActiveCloudboxDownloads[id]["info"]["name"] .. "\"", progress)
+	end
 
 	if progress != 1 then return end
 
-	notification.Kill("CloudboxPackageDownload" .. id)
-	timer.Remove("CloudboxNotificationKiller" .. id)
+	if !game.SinglePlayer then
+		notification.Kill("CloudboxPackageDownload" .. id)
+		timer.Remove("CloudboxNotificationKiller" .. id)
+	end
 
 	// if it's not us
 	if ActiveCloudboxDownloads[id]["requester"]:SteamID64() != LocalPlayer():SteamID64() then

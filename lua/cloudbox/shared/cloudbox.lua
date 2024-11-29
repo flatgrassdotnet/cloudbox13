@@ -140,11 +140,12 @@ function MountCloudboxPackage(info, attempt)
 
 		if !CLIENT then return end // client only after this
 
+		local total = table.Count(CloudboxContentDownloads[pid])
+		local delay = 1 / total
 
 		// show download animation finishing
-		timer.Create("CloudboxDownloadSimulator" .. pid, math.Rand(0.05, 0.2), #CloudboxContentDownloads[pid], function()
-			// randomness
-			timer.Adjust("CloudboxDownloadSimulator" .. pid, math.Rand(0.05, 0.2))
+		timer.Create("CloudboxDownloadSimulator" .. pid, 0, delay, function()
+			timer.Adjust("CloudboxDownloadSimulator" .. pid, delay * math.Rand(0.5, 1.5))
 
 			for id, dl in pairs(CloudboxContentDownloads[pid]) do UpdatePackageDownloadStatus(pid, id, dl.name, 1, "success", dl.size) break end
 
