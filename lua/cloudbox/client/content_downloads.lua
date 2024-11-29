@@ -16,29 +16,34 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-Downloads = {}
+CloudboxContentDownloads = {}
 local Main = nil
 
-function UpdatePackageDownloadStatus(id, name, f, status, size)
+function UpdatePackageDownloadStatus(pid, id, name, f, status, size)
 	if !Main then
-		Main = vgui.Create( "DContentMain", GetHUDPanel() )
+		Main = vgui.Create("DContentMain", GetHUDPanel())
 	end
 
-	local dl = Downloads[id]
+	local p = CloudboxContentDownloads[pid]
+
+	if !p then
+		CloudboxContentDownloads[pid] = {}
+	end
+
+	local dl = CloudboxContentDownloads[pid][id]
 
 	if !dl then
 		dl = vgui.Create("DContentDownload", Main)
 		dl.Velocity = Vector(0, 0, 0);
 		//dl:SetAlpha(10) // starts mostly transparent because it's waiting for download progress, we can't do this on cloudbox
-		Downloads[id] = dl
-		Main:Add(dl)
+		CloudboxContentDownloads[pid][id] = dl
 	end
 
 	dl:Update(f, name, size);
 
 	if status == "success" then
 		dl:Bounce()
-		Downloads[id] = nil
+		CloudboxContentDownloads[pid][id] = nil
 		surface.PlaySound("garrysmod/content_downloaded.wav")
 
 		timer.Simple(2, function() dl:Remove() end)
@@ -46,11 +51,11 @@ function UpdatePackageDownloadStatus(id, name, f, status, size)
 
 	if status == "failed" then
 		dl:Failed()
-		Downloads[id] = nil
+		CloudboxContentDownloads[pid][id] = nil
 		surface.PlaySound("garrysmod/content_downloaded.wav")
 
 		timer.Simple(2, function() dl:Remove() end)
 	end
 
-	Main:OnActivity(Downloads)
+	Main:OnActivity(CloudboxContentDownloads)
 end

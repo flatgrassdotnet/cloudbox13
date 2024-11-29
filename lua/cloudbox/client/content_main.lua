@@ -28,18 +28,18 @@ function PANEL:Think()
 	self:SetParent(GetHUDPanel())
 
 	/*if self.LastActivity && (SysTime() - self.LastActivity) > 2 then // has a 2 sec timeout before it removes the icons, cloudbox doesn't do progress so this is disabled
-		self:MoveTo( self.x, ScrH() + 5, 0.5, 0.5 )
+		self:MoveTo(self.x, ScrH() + 5, 0.5, 0.5)
 		self.LastActivity = nil;
 		self.MaxFileCount = 0
 	end*/
 
-	for k, v in pairs(Downloads) do
-		local x = (self:GetWide() * 0.5) + math.sin(SysTime() + k * -0.43) * self:GetWide() * 0.45
-		local y = 20 + math.cos( SysTime() + k * -0.43) * 20 * 0.5
-		v:SetPos(x - 13, y)
-		v:SetZPos(y)
-
-		v.accel = accel;
+	for _, downloads in pairs(CloudboxContentDownloads) do // for each package
+		for id, icon in pairs(downloads) do
+			local x = (self:GetWide() * 0.5) + math.sin(SysTime() + id * -0.43) * self:GetWide() * 0.45
+			local y = 20 + math.cos(SysTime() + id * -0.43) * 20 * 0.5
+			icon:SetPos(x - 13, y)
+			icon:SetZPos(y)
+		end
 	end
 end
 
@@ -55,9 +55,4 @@ function PANEL:PerformLayout()
 	self:CenterHorizontal()
 end
 
-function PANEL:Add(p)
-	local x, y = self:GetPos()
-	local ypos = math.random(20, 25)
-end
-
-vgui.Register( "DContentMain", PANEL, "Panel" )
+vgui.Register("DContentMain", PANEL, "Panel")

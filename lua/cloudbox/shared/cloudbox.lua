@@ -120,8 +120,10 @@ function MountCloudboxPackage(info, attempt)
 
 	// otherwise get it from cloudbox
 
+	local pid = info["id"] .. "r" .. info["rev"]
+
 	// add stuff to download indicator
-	if CLIENT and info["content"] then for k, v in pairs(info["content"]) do UpdatePackageDownloadStatus(v["id"], v["path"], 0, "downloading", v["size"]) end end
+	if CLIENT and info["content"] then for k, v in pairs(info["content"]) do UpdatePackageDownloadStatus(pid, v["id"], v["path"], 0, "downloading", v["size"]) end end
 
 	local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. info["id"] .. "&rev=" .. info["rev"]
 	http.Fetch(url, function(body, size)
@@ -138,16 +140,19 @@ function MountCloudboxPackage(info, attempt)
 
 		if !CLIENT then return end // client only after this
 
-		local uid = info["id"] .. "r" .. info["rev"]
 
 		// show download animation finishing
-		timer.Create("CloudboxDownloadSimulator" .. uid, math.Rand(0.05, 0.2), #Downloads, function()
+		timer.Create("CloudboxDownloadSimulator" .. pid, math.Rand(0.05, 0.2), #CloudboxContentDownloads[pid], function()
 			// randomness
-			timer.Adjust("CloudboxDownloadSimulator" .. uid, math.Rand(0.05, 0.2))
+			timer.Adjust("CloudboxDownloadSimulator" .. pid, math.Rand(0.05, 0.2))
 
-			for id, dl in pairs(Downloads) do UpdatePackageDownloadStatus(id, dl.name, 1, "success", dl.size) break end
+			for id, dl in pairs(CloudboxContentDownloads[pid]) do UpdatePackageDownloadStatus(pid, id, dl.name, 1, "success", dl.size) break end
 
-			if table.IsEmpty(Downloads) then ExecuteCloudboxPackage(info) timer.Remove("CloudboxDownloadSimulator" .. uid) return end
+			if !table.IsEmpty(CloudboxContentDownloads[pid]) then return end
+
+			ExecuteCloudboxPackage(info)
+			timer.Remove("CloudboxDownloadSimulator" .. pid)
+			CloudboxContentDownloads[pid] = nil
 		end)
 	end)
 end
