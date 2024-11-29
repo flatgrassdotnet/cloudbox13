@@ -109,42 +109,47 @@ function MountCloudboxPackage(info, attempt)
 	if file.Exists(path, "DATA") then // if we have the package content locally then load it
 		local success = game.MountGMA("data/" .. path)
 		if !success and attempt < 3 then // delete and reacquire
-			file.Delete(path, "DATA")
+			file.Delete(path, "DATA") // FIXME: doesn't actually work because MountGMA doesn't release the file
 			MountCloudboxPackage(info, attempt + 1)
 			return
 		end
 
 		if CLIENT then ExecuteCloudboxPackage(info) end
-	else // otherwise get it from cloudbox
-		// add stuff to download indicator
-		if CLIENT and info["content"] then for k, v in pairs(info["content"]) do UpdatePackageDownloadStatus(v["id"], v["path"], 0, "downloading", v["size"]) end end
-
-		local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. info["id"] .. "&rev=" .. info["rev"]
-		http.Fetch(url, function(body, size)
-			if size == 0 then return end // something broke
-
-			file.Write(path, body) // write to disk
-
-			local success = game.MountGMA("data/" .. path)
-			if !success and attempt < 3 then // delete and reacquire
-				file.Delete(path, "DATA")
-				MountCloudboxPackage(info, attempt + 1)
-				return
-			end
-
-			if !CLIENT then return end // client only after this
-
-			// show download animation finishing
-			timer.Create("CloudboxDownloadSimulator", math.Rand(0.05, 0.2), #Downloads, function()
-				// randomness
-				timer.Adjust("CloudboxDownloadSimulator", math.Rand(0.05, 0.2))
-
-				for id, dl in pairs(Downloads) do UpdatePackageDownloadStatus(id, dl.name, 1, "success", dl.size) break end
-
-				if table.IsEmpty(Downloads) then ExecuteCloudboxPackage(info) return end
-			end)
-		end)
+		return
 	end
+
+	// otherwise get it from cloudbox
+
+	// add stuff to download indicator
+	if CLIENT and info["content"] then for k, v in pairs(info["content"]) do UpdatePackageDownloadStatus(v["id"], v["path"], 0, "downloading", v["size"]) end end
+
+	local url = "https://api.cl0udb0x.com/packages/getgma?id=" .. info["id"] .. "&rev=" .. info["rev"]
+	http.Fetch(url, function(body, size)
+		if size == 0 then return end // something broke
+
+		file.Write(path, body) // write to disk
+
+		local success = game.MountGMA("data/" .. path)
+		if !success and attempt < 3 then // delete and reacquire
+			file.Delete(path, "DATA") // FIXME: doesn't actually work because MountGMA doesn't release the file
+			MountCloudboxPackage(info, attempt + 1)
+			return
+		end
+
+		if !CLIENT then return end // client only after this
+
+		local uid = info["id"] .. "r" .. info["rev"]
+
+		// show download animation finishing
+		timer.Create("CloudboxDownloadSimulator" .. uid, math.Rand(0.05, 0.2), #Downloads, function()
+			// randomness
+			timer.Adjust("CloudboxDownloadSimulator" .. uid, math.Rand(0.05, 0.2))
+
+			for id, dl in pairs(Downloads) do UpdatePackageDownloadStatus(id, dl.name, 1, "success", dl.size) break end
+
+			if table.IsEmpty(Downloads) then ExecuteCloudboxPackage(info) timer.Remove("CloudboxDownloadSimulator" .. uid) return end
+		end)
+	end)
 end
 
 CreateConVar("cloudbox_userchangelevel", "0", {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED}, "Allow non-admins to changelevel to Cloudbox maps", 0, 1)
