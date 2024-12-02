@@ -24,6 +24,7 @@ if SERVER then
 	// client
 	AddCSLuaFile("cloudbox/client/commands.lua")
 	AddCSLuaFile("cloudbox/client/joinmessage.lua")
+	AddCSLuaFile("cloudbox/client/options.lua")
 	AddCSLuaFile("cloudbox/client/request.lua")
 	AddCSLuaFile("cloudbox/client/spawnmenu.lua")
 
@@ -42,6 +43,7 @@ end
 if CLIENT then
 	include("cloudbox/client/commands.lua")
 	include("cloudbox/client/joinmessage.lua")
+	include("cloudbox/client/options.lua")
 	include("cloudbox/client/request.lua")
 	include("cloudbox/client/spawnmenu.lua")
 
