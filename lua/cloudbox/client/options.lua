@@ -11,11 +11,11 @@ hook.Add("PopulateToolMenu", "AddCloudboxOptions", function()
 		panel:Help("Enter offline mode to view cached downloads")
 		panel:Button("Offline Mode", "cloudbox_localmode")
 
-		panel:Help("Clear Downloads Cache: \n\rContent will be redownloaded as needed")
+		panel:Help("Clear local downloads cache")
 		panel:Button("Delete Downloads", "cloudbox_purgecache"):SetTextColor(Color(255, 0, 0))
 	end)
 
-	if game.SinglePlayer then return end
+	if game.SinglePlayer and !LocaLPlayer():IsAdmin() then return end
 
 	spawnmenu.AddToolMenuOption("Options", "Cloudbox", "CloudboxServer", "Server", "", "", function(panel)
 		panel:ClearControls()
@@ -23,7 +23,7 @@ hook.Add("PopulateToolMenu", "AddCloudboxOptions", function()
 		panel:CheckBox("Allow non-admins to changelevel to Cloudbox maps", "cloudbox_userchangelevel")
 		panel:CheckBox("Only allow admins to download from Cloudbox", "cloudbox_adminonly")
 
-		panel:Help("Clear Server's Downloads Cache: \n\rContent will be redownloaded as needed")
+		panel:Help("Clear server's local download cache")
 		panel:Button("Delete Downloads", "sv_cloudbox_purgecache"):SetTextColor(Color(255, 0, 0))
 	end)
 end)
