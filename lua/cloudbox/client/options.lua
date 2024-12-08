@@ -15,7 +15,7 @@ hook.Add("PopulateToolMenu", "AddCloudboxOptions", function()
 		panel:Button("Delete Downloads", "cloudbox_purgecache"):SetTextColor(Color(255, 0, 0))
 	end)
 
-	if game.SinglePlayer and !LocaLPlayer():IsAdmin() then return end
+	if game.SinglePlayer then return end
 
 	spawnmenu.AddToolMenuOption("Options", "Cloudbox", "CloudboxServer", "Server", "", "", function(panel)
 		panel:ClearControls()

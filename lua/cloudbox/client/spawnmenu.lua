@@ -37,6 +37,7 @@ function LoadCloudbox(panel)
 	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
 	html:AddFunction("cloudbox", "SetFocused", CloudboxFocus)
 	html:AddFunction("cloudbox", "InitiateLocalMode", function() cbOnline = true LoadCloudboxOffline(panel) end)
+	html:AddFunction("cloudbox", "OpenSettings", function() spawnmenu.ActivateTool("CloudboxUser", true) end)
 
 	html.OnChangeTitle = function(_, title)
 		if not (not cbOnline and title == "Cloudbox") then return end
