@@ -48,7 +48,7 @@ function LoadCloudbox(panel)
 			gui.OpenURL("https://steamcommunity.com/id/keroronpa")
 		end
 	end)
-	
+
 	html:AddFunction("cloudbox", "ToggleDarkMode", function(param)
 		GetConVar("cloudbox_darkmode"):SetBool(param)
 		if param then
