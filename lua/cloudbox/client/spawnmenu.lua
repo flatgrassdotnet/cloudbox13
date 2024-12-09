@@ -117,7 +117,7 @@ function LoadCloudboxOffline(panel)
 			LoadCloudbox(panel)
 		end)
 	end)
-	
+
 	cbHtmlBackground:QueueJavascript("document.getElementById('darkmode').innerText=\"\";") // offline mode doesn't support dark mode
 
 	cbHtmlOffline = html
@@ -129,7 +129,7 @@ function AddCloudboxTab()
 	local htmlBG = vgui.Create("DHTML", panel)
 	htmlBG:Dock(FILL)
 	htmlBG:SetHTML("<html><body><style type='text/css'>html,body{background:#B8E3FF;width:100%;height:100%;overflow:hidden;}#top{width:100%; height:86px; position:absolute;top:0;left:0;right:0;background:#4096ee;}  #topclouds {width:100%;position:absolute;top:86px; left:0; right:0; height: 40px;  background-image: url(\"asset://garrysmod/materials/cloudbox/clouds.png\");  background-color: #4096EE; -webkit-animation: swoosh 10s linear infinite;} @-webkit-keyframes swoosh {0% {background-position: 318px;} 100% {background-position: 0px;}} @-webkit-keyframes spin { 0% {-webkit-transform:rotateZ(0deg)} 100% {-webkit-transform:rotateZ(360deg)} } #load {-webkit-animation:spin 10s linear infinite; text-align:center; display:inline-block; position:absolute; top:50%; left:50%;} #load img {position:relative;}</style><style type='text/css' id='darkmode'></style><div id='top'></div><div id='topclouds'></div><div id='load'><img src=\"asset://garrysmod/materials/cloudbox/loading.png\" /></div></body></html>")
-	
+
 	cbHtmlBackground = htmlBG
 
 	LoadCloudbox(panel)
@@ -139,7 +139,7 @@ function AddCloudboxTab()
 		LoadCloudboxOffline(panel)
 		spawnmenu.SwitchCreationTab("Cloudbox")
 	end)
-	
+
 	return panel
 end
 
