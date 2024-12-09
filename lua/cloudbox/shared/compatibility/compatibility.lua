@@ -231,6 +231,12 @@ CloudboxScriptReplacements = {
 	["\"HUDNumber5\""] = "\"CloseCaption_Bold\"",
 	["\"MenuLarge\""] = "\"HudSelectionText\"",
 	["\"ScoreboardText\""] = "\"ScoreboardDefault\"",
+	["\"HUDNumber\""] = "\"HUDNumbers\"",
+	["\"TitleFont2\""] = "\"ClientTitleFont\"",
+
+	// DSysButton was removed in favour of native closing. To prevent errors, replace with a normal button
+	["\"DSysButton\""] = "\"DButton\"",
+	[":SetType%s*%(%s*\"close\"%s*%)"] = ":SetText%(\"x\"%)",
 
 	// surface.DrawTexturedRectUV parameters have changed
 	["surface.DrawTexturedRectUV%s*%("] = "DrawTexturedRectUVCloudbox%(",
