@@ -17,6 +17,9 @@
 */
 
 if SERVER then
+	// workshop
+	resource.AddWorkshop("3365311511")
+
 	// server
 	include("cloudbox/server/commands.lua")
 	include("cloudbox/server/request.lua")
