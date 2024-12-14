@@ -180,13 +180,26 @@ end
 function HookAddCloudbox(eventName, identifier, func)
 	// Some scripts incorrectly use numbers
 	if isnumber(identifier) then identifier = tostring(identifier) end
+
+	// Override callback function for EntityTakeDamage. 
+	// Arguments 'ent,inflictor,attacker,amount,dmginfo' have been collapsed to just 'ent,dmginfo'.
+	if eventName == "EntityTakeDamage" then
+		local hooked = func
+		func = function(ent, dmginfo)
+			inflictor = dmginfo:GetInflictor()
+			attacker = dmginfo:GetAttacker()
+			amount = dmginfo:GetDamage()
+			return hooked(ent, inflictor, attacker, amount, dmginfo)
+		end
+	end
+
 	hook.Add(eventName, identifier, func)
 end
 
 CloudboxScriptReplacements = {
 	// "Entity:SetColor and Entity:GetColor now deal with Colors only"
 	[":SetColor%s*%("] = ":SetColorCloudbox%(",
-	
+
 	// GetColor only returns the Color now. Some scripts require it split. Hacky fix.
 	["local r,%s*g,%s*b,%s*a%s*=%s*self:GetColor%(%)"] = "local r, g, b, a = self:GetColor%(%):Unpack%(%)",
 
