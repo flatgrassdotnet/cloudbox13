@@ -1,0 +1,30 @@
+html,body {-webkit-user-select: none;}
+
+.header {height: 86px; -webkit-box-pack: justify;}
+
+#offlinenote {margin-top: 10px; padding: 3px 5px; margin-left: 10px; background-color: #FFE292; color: black; display: inline-block; font-size: 13px;}
+#offlinenote p {margin-top: 3px; margin-bottom: 3px; }
+
+#retry {cursor: pointer; margin-right: 4px;} 
+#retry .navicon {background-image: url("asset://garrysmod/materials/cloudbox/reconnect.png");}
+.topclouds_hidden {visibility: hidden; opacity: 0; animation-play-state: paused; -webkit-animation-play-state: paused;} /* todo: port this line to the site */
+
+.content {padding-bottom: 0px; padding-top: 0px;}
+
+.column_container {display:-webkit-box; webkit-box-orient: vertical;} 
+
+.pillbox.column {width: 33%; width: calc(100% / 3); margin-left: 0; margin-right: 0; display: inline-block; vertical-align: top; text-align: center; -webkit-box-flex: 1; background-color: transparent; -webkit-border-radius: 0px; border-radius: 0px; margin-bottom: 0px; padding-top: 1px;}
+.pillbox.column:not(:first-child) {border-left: 1px dotted #4096ee;} 
+.pillbox.column:not(:last-child) {border-right: 1px dotted #4096ee;} 
+.pillbox.column:nth-child(2n) {margin-top: 1px; padding-top:0px;}
+
+.pillbox.column h2.pillbox {margin-left: auto; margin-bottom:0px; margin-right: auto; -webkit-border-radius: 8px; border-radius: 8px;}
+
+.item {margin-left: 2.5px; margin-right: 2.5px; width: 132px; height: 122px;}
+
+p.noitems {font-size: small; font-weight: bold;}
+
+
+::-webkit-scrollbar-button:decrement {background-image: url("data:image/gif;base64,R0lGODlhBwAEAIABAFlZWf///yH5BAEAAAEALAAAAAAHAAQAQAIHjGEHi9oMCwA7");} 
+::-webkit-scrollbar-button:decrement:active {background-image: url("data:image/gif;base64,R0lGODlhBwAEAIABAECW7v///yH5BAEAAAEALAAAAAAHAAQAQAIHjGEHi9oMCwA7");}
+::-webkit-scrollbar-button:increment {background-image: url("data:image/gif;base64,R0lGODlhBwAEAIABAFlZWf///yH5BAEAAAEALAAAAAAHAAQAQAIIhA8Rp4u9WgEAOw==");} ::-webkit-scrollbar-button:increment:active {background-image: url("data:image/gif;base64,R0lGODlhBwAEAIABAECW7v///yH5BAEAAAEALAAAAAAHAAQAQAIIhA8Rp4u9WgEAOw==")}

@@ -1,0 +1,1 @@
+.topclouds {background-image: url("asset://garrysmod/materials/cloudbox/clouds-dark.png");}

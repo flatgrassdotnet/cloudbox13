@@ -1,0 +1,1 @@
+.pillbox.column:not(:first-child), .pillbox.column:not(:last-child) {border-color: #273b52;}
