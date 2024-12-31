@@ -49,8 +49,7 @@ function LoadCloudboxOffline(panel)
 
 		fallbackContent = fallbackContent .. "<div class='pillbox column'><h2 class='pillbox'>" .. v[2] .. "</h2><br/>" .. txt .. "</div> "
 	end
-	
-	
+
 	local isDark = GetConVar("cloudbox_darkmode"):GetBool()
 	local darkCSS = " disabled"
 	if isDark then darkCSS = "" end
@@ -69,7 +68,7 @@ function LoadCloudboxOffline(panel)
 			spnMenu:Add(newPanel)
 		end)
 	end)
-	
+
 	cbHtmlOffline = html
 end
 
@@ -80,17 +79,17 @@ function AddCloudboxTab()
 	function panel:Paint( w, h )
 		draw.RoundedBox( 0, 0, 0, w, h, Color(184, 227, 255, 255) )
 	end
-	
+
 	-- Loading spinner
 	local spinner = vgui.Create("DPanel", panel)
 	local spinnerImg = Material( "cloudbox/loading.png", "noclamp smooth" )
 	local isSpinning = true
-    spinner:SetSize( 78, 78 )
+	spinner:SetSize( 78, 78 )
 	function spinner:Paint( w, h )
 		if isSpinning then
-			surface.SetDrawColor( color_white )
+			surface.SetDrawColor(color_white)
 			surface.SetMaterial(spinnerImg)
-			surface.DrawTexturedRectRotated( w/2, h/2, w, h, -((CurTime()/5)%1)*360 )
+			surface.DrawTexturedRectRotated(w / 2, h / 2, w, h, -((CurTime() / 5) % 1) * 360)
 		end
 	end
 	timer.Simple(10, function()
@@ -106,7 +105,7 @@ function AddCloudboxTab()
 	container:InvalidateLayout(true)
 	container:SetSize(400,95)
 	container:DockPadding(5,0,5,0)
-	
+
 	local txt1 = vgui.Create("DLabel", container)
 	txt1:SetText("Loading Cloudbox...")
 	txt1:SetFont("HudDefault")
@@ -115,7 +114,7 @@ function AddCloudboxTab()
 	txt1:SetTextColor(Color(64, 150, 238,255))
 	txt1:Dock(TOP)
 	txt1:DockMargin(10,10,10,0)
-	
+
 	local txt2 = vgui.Create("DLabel", container)
 	txt2:SetText("If Cloudbox does not load, try Reconnect or spawn cached items Offline.")
 	txt2:SetFont("DermaDefault")
@@ -124,12 +123,11 @@ function AddCloudboxTab()
 	txt2:SetTextColor(Color(51, 51, 51,255))
 	txt2:Dock(TOP)
 	txt2:DockMargin(10,5,10,0)
-	
-		
+
 	local btnRetry = vgui.Create("DButton", container)
 	btnRetry:SetText("Reconnect")
 	btnRetry:SetFont("Trebuchet18")
-	btnRetry.DoClick = function() 
+	btnRetry.DoClick = function()
 		local spnMenu = panel:GetParent()
 		panel:Remove()
 		cbOnline = false
@@ -142,7 +140,7 @@ function AddCloudboxTab()
 	btnRetry:Dock(LEFT)
 	btnRetry:DockMargin(5,10,5,10)
 	btnRetry:SetWidth(120)
-	
+
 	local btnOpt = vgui.Create("DButton", container)
 	btnOpt:SetText("Options")
 	btnOpt:SetFont("Trebuchet18")
@@ -150,7 +148,7 @@ function AddCloudboxTab()
 	btnOpt:Dock(LEFT)
 	btnOpt:DockMargin(5,10,5,10)
 	btnOpt:SetWidth(120)
-	
+
 	local btnData = vgui.Create("DButton", container)
 	btnData:SetText("Offline Mode")
 	btnData:SetFont("Trebuchet18")
@@ -164,7 +162,6 @@ function AddCloudboxTab()
 		spinner:SetPos(spinner:GetX(), spinner:GetY() - 100)
 		container:Center()
 	end
-	
 
 	-- Online panel
 	local html = vgui.Create("DHTML", panel)
@@ -206,13 +203,13 @@ function AddCloudboxTab()
 
 		if cbHtmlOffline then cbHtmlOffline:Remove() end
 	end
-	
+
 	concommand.Add("cloudbox_localmode", function()
 		cbOnline = true
 		LoadCloudboxOffline(panel)
 		spawnmenu.SwitchCreationTab("Cloudbox")
 	end)
-	
+
 	cbHtmlOnline = html
 
 	return panel

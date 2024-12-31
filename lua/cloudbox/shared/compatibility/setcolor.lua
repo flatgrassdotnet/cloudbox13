@@ -39,11 +39,11 @@ if CLIENT then
 	local cCLuaParticle = FindMetaTable("CLuaParticle")
 	local cProjectedTexture = FindMetaTable("ProjectedTexture")
 
-	function cCLuaParticle:SetColorCloudbox(r, g, b, a)
+	function cCLuaParticle:SetColorCloudbox(r, g, b)
 		if IsColor(r) then
 			self:SetColor(r)
 		else
-			self:SetColor(Color(r, g, b, a))
+			self:SetColor(r, g, b) // intentionally missing Color()
 		end
 	end
 
