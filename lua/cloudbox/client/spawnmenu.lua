@@ -19,59 +19,6 @@
 local cbOnline = false
 local cbHtmlOnline = nil
 local cbHtmlOffline = nil
-local cbHtmlBackground = nil
-
-function LoadCloudbox(panel)
-	local html = vgui.Create("DHTML", panel)
-
-	local function CloudboxFocus(focus)
-		local id = "OnTextEntryGetFocus" if not focus then id = "OnTextEntryLoseFocus" end
-		hook.Run(id, html)
-	end
-
-	html:Dock(FILL)
-	html:OpenURL("https://safe.cl0udb0x.com")
-	html:SetVisible(false)
-
-	html.Paint = function() return false end
-
-	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
-	html:AddFunction("cloudbox", "SetFocused", CloudboxFocus)
-	html:AddFunction("cloudbox", "InitiateLocalMode", function() cbOnline = true LoadCloudboxOffline(panel) end)
-	html:AddFunction("cloudbox", "OpenSettings", function() spawnmenu.ActivateTool("CloudboxUser", true) end)
-	html:AddFunction("cloudbox", "OpenLink", function(param)
-		if param == "workshop" then
-			gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/?id=3365311511")
-		elseif param == "workshop-comments" then
-			gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/comments/3365311511")
-		elseif param == "pancakes" then
-			gui.OpenURL("https://steamcommunity.com/id/keroronpa")
-		end
-	end)
-
-	html:AddFunction("cloudbox", "ToggleDarkMode", function(param)
-		GetConVar("cloudbox_darkmode"):SetBool(param)
-		if param then
-			cbHtmlBackground:QueueJavascript("forceMode(true);")
-		else
-			cbHtmlBackground:QueueJavascript("forceMode(false);")
-		end
-	end)
-
-	html.OnChangeTitle = function(_, title)
-		if not (not cbOnline and title == "Cloudbox") then return end
-
-		cbOnline = true
-		html:SetVisible(true)
-		if GetConVar("cloudbox_darkmode"):GetBool() then html:QueueJavascript("forceMode(true);") end
-
-		if cbHtmlOffline then cbHtmlOffline:Remove() end
-	end
-
-	timer.Simple(5, function() if not cbOnline then LoadCloudboxOffline(panel) end end)
-
-	cbHtmlOnline = html
-end
 
 function LoadCloudboxOffline(panel)
 	if cbHtmlOnline then cbHtmlOnline:SetVisible(false) end
@@ -107,18 +54,19 @@ function LoadCloudboxOffline(panel)
 	local isDark = GetConVar("cloudbox_darkmode"):GetBool()
 	local darkCSS = " disabled"
 	if isDark then darkCSS = "" end
-	cbHtmlBackground:QueueJavascript("forceMode(" .. tostring(isDark) .. ")")
 
 	local html = vgui.Create("DHTML", panel)
 	html:Dock(FILL)
-	html:SetHTML("<html><head><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox-dark.css.txt' type='text/css' " .. darkCSS .. "><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline-dark.css.txt' type='text/css' " .. darkCSS .. "></head><body><div class='header'><div id='offlinenote'><p>You are in offline mode. Browse cached downloads or click Reconnect to go online.</p></div><div class='navbar'><a id='retry' onclick='cloudbox.RetryOnline(); return false;' href=\"javascript:void(0);\"><div class='navicon'></div><br>Reconnect</a></div></div><div class='topclouds topclouds_hidden'></div><div class='content'><div class='column_container'>" .. fallbackContent .. "</div></div></body></html>")
+	html:SetHTML("<html><head><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox-dark.css.txt' type='text/css' " .. darkCSS .. "><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline-dark.css.txt' type='text/css' " .. darkCSS .. "></head><body><div class='header'><div id='offlinenote'><p>You are in offline mode. Browse cached downloads or click Reconnect to go online.</p></div><div class='navbar'><a id='retry' onclick='cloudbox.RetryOnline(); return false;' href=\"javascript:void(0);\"><div class='navicon'></div><br>Reconnect</a></div></div><div class='topclouds'></div><div class='content'><div class='column_container'>" .. fallbackContent .. "</div></div></body></html>")
 	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
 	html:AddFunction("cloudbox", "RetryOnline", function()
-		timer.Simple(0.01, function() // delay to prevent crash in Awesomium. CEF doesn't require this.
-			cbOnline = false
-			html:Remove()
-			if cbHtmlOnline then cbHtmlOnline:Remove() end
-			LoadCloudbox(panel)
+		local spnMenu = panel:GetParent()
+		panel:Remove()
+		cbOnline = false
+		timer.Simple(0, function() -- timer required to prevent crash in Awesomium. Not needed for CEF.
+			local newPanel = AddCloudboxTab()
+			newPanel:Dock(FILL)
+			spnMenu:Add(newPanel)
 		end)
 	end)
 	
@@ -126,20 +74,146 @@ function LoadCloudboxOffline(panel)
 end
 
 function AddCloudboxTab()
+
+	-- Blue background container
 	local panel = vgui.Create("DPanel")
+	function panel:Paint( w, h )
+		draw.RoundedBox( 0, 0, 0, w, h, Color(184, 227, 255, 255) )
+	end
+	
+	-- Loading spinner
+	local spinner = vgui.Create("DPanel", panel)
+	local spinnerImg = Material( "cloudbox/loading.png", "noclamp smooth" )
+	local isSpinning = true
+    spinner:SetSize( 78, 78 )
+	function spinner:Paint( w, h )
+		if isSpinning then
+			surface.SetDrawColor( color_white )
+			surface.SetMaterial(spinnerImg)
+			surface.DrawTexturedRectRotated( w/2, h/2, w, h, -((CurTime()/5)%1)*360 )
+		end
+	end
+	timer.Simple(10, function()
+		isSpinning = false
+	end)
 
-	local htmlBG = vgui.Create("DHTML", panel)
-	htmlBG:Dock(FILL)
-	htmlBG:SetHTML("<html><head><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox-dark.css.txt' type='text/css' disabled><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/background.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/background-dark.css.txt' type='text/css' disabled><script src='asset://garrysmod/data_static/cloudbox/background.js.txt'></script></head><body><div class='header'></div><div class='topclouds'></div><div class='content'><div id='load'></div></div></body></html>")
-	cbHtmlBackground = htmlBG
 
-	LoadCloudbox(panel)
+	-- Fallback panel
+	local container = vgui.Create("DPanel", panel)
+	function container:Paint( w, h )
+		draw.RoundedBox( 8, 0, 0, w, h, Color(255, 255, 255, 255) )
+	end
+	container:InvalidateLayout(true)
+	container:SetSize(400,95)
+	container:DockPadding(5,0,5,0)
+	
+	local txt1 = vgui.Create("DLabel", container)
+	txt1:SetText("Loading Cloudbox...")
+	txt1:SetFont("HudDefault")
+	txt1:SetAutoStretchVertical(true)
+	txt1:SetContentAlignment(5)
+	txt1:SetTextColor(Color(64, 150, 238,255))
+	txt1:Dock(TOP)
+	txt1:DockMargin(10,10,10,0)
+	
+	local txt2 = vgui.Create("DLabel", container)
+	txt2:SetText("If Cloudbox does not load, try Reconnect or spawn cached items Offline.")
+	txt2:SetFont("DermaDefault")
+	txt2:SetAutoStretchVertical(true)
+	txt2:SetContentAlignment(5)
+	txt2:SetTextColor(Color(51, 51, 51,255))
+	txt2:Dock(TOP)
+	txt2:DockMargin(10,5,10,0)
+	
+		
+	local btnRetry = vgui.Create("DButton", container)
+	btnRetry:SetText("Reconnect")
+	btnRetry:SetFont("Trebuchet18")
+	btnRetry.DoClick = function() 
+		local spnMenu = panel:GetParent()
+		panel:Remove()
+		cbOnline = false
+		timer.Simple(0, function() -- timer required to prevent crash in Awesomium. Not needed for CEF.
+			local newPanel = AddCloudboxTab()
+			newPanel:Dock(FILL)
+			spnMenu:Add(newPanel)
+		end)
+	end
+	btnRetry:Dock(LEFT)
+	btnRetry:DockMargin(5,10,5,10)
+	btnRetry:SetWidth(120)
+	
+	local btnOpt = vgui.Create("DButton", container)
+	btnOpt:SetText("Options")
+	btnOpt:SetFont("Trebuchet18")
+	btnOpt.DoClick = function() spawnmenu.ActivateTool("CloudboxUser", true) end
+	btnOpt:Dock(LEFT)
+	btnOpt:DockMargin(5,10,5,10)
+	btnOpt:SetWidth(120)
+	
+	local btnData = vgui.Create("DButton", container)
+	btnData:SetText("Offline Mode")
+	btnData:SetFont("Trebuchet18")
+	btnData:SetConsoleCommand("cloudbox_localmode")
+	btnData:Dock(LEFT)
+	btnData:DockMargin(5,10,5,10)
+	btnData:SetWidth(120)
 
+	panel.PerformLayout = function()
+		spinner:Center()
+		spinner:SetPos(spinner:GetX(), spinner:GetY() - 100)
+		container:Center()
+	end
+	
+
+	-- Online panel
+	local html = vgui.Create("DHTML", panel)
+
+	local function CloudboxFocus(focus)
+		local id = "OnTextEntryGetFocus" if not focus then id = "OnTextEntryLoseFocus" end
+		hook.Run(id, html)
+	end
+
+	html:Dock(FILL)
+	html:OpenURL("https://safe.cl0udb0x.com")
+	html:SetVisible(false)
+
+	html.Paint = function() return false end
+
+	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
+	html:AddFunction("cloudbox", "SetFocused", CloudboxFocus)
+	html:AddFunction("cloudbox", "OpenSettings", function() spawnmenu.ActivateTool("CloudboxUser", true) end)
+	html:AddFunction("cloudbox", "OpenLink", function(param)
+		if param == "workshop" then
+			gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/?id=3365311511")
+		elseif param == "workshop-comments" then
+			gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/comments/3365311511")
+		elseif param == "pancakes" then
+			gui.OpenURL("https://steamcommunity.com/id/keroronpa")
+		end
+	end)
+
+	html:AddFunction("cloudbox", "ToggleDarkMode", function(param)
+		GetConVar("cloudbox_darkmode"):SetBool(param)
+	end)
+
+	html.OnChangeTitle = function(_, title)
+		if not (not cbOnline and title == "Cloudbox") then return end
+
+		cbOnline = true
+		html:SetVisible(true)
+		if GetConVar("cloudbox_darkmode"):GetBool() then html:QueueJavascript("forceMode(true);") end
+
+		if cbHtmlOffline then cbHtmlOffline:Remove() end
+	end
+	
 	concommand.Add("cloudbox_localmode", function()
 		cbOnline = true
 		LoadCloudboxOffline(panel)
 		spawnmenu.SwitchCreationTab("Cloudbox")
 	end)
+	
+	cbHtmlOnline = html
 
 	return panel
 end

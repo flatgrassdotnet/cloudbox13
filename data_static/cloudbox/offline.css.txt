@@ -2,12 +2,15 @@ html,body {-webkit-user-select: none;}
 
 .header {height: 86px; -webkit-box-pack: justify;}
 
+.topclouds {background-image: url("asset://garrysmod/materials/cloudbox/clouds.png");}
+
 #offlinenote {margin-top: 10px; padding: 3px 5px; margin-left: 10px; background-color: #FFE292; color: black; display: inline-block; font-size: 13px;}
 #offlinenote p {margin-top: 3px; margin-bottom: 3px; }
 
+
 #retry {cursor: pointer; margin-right: 4px;} 
 #retry .navicon {background-image: url("asset://garrysmod/materials/cloudbox/reconnect.png");}
-.topclouds_hidden {visibility: hidden; opacity: 0; animation-play-state: paused; -webkit-animation-play-state: paused;} /* todo: port this line to the site */
+
 
 .content {padding-bottom: 0px; padding-top: 0px;}
 

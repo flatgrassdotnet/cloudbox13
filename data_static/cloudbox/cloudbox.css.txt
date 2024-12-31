@@ -1,25 +1,28 @@
 html, body {background-color: transparent;}
-body {height: 100%; margin: 0px; font-family: Helvetica; color: #333; display: -webkit-box; -webkit-box-orient: vertical;}
+html {height: 100%;}
+body {height: 100%; margin: 0px; font-family: Helvetica; color: #333; display: -webkit-box; -webkit-box-orient: vertical; accent-color: #4096ee;}
 a {color: #333; text-decoration: none;}
 a:hover {color: #FFF;}
 h1 {margin-left: 10px;}
-a.textlink {font-weight:bold; cursor: pointer;}
-a.textlink:hover {color: #4096ee;}
+a.textlink {font-weight: bold; cursor: pointer;}
+a.textlink:hover {color: #4096EE;}
 form {margin-bottom: 0;}
 
+.hastooltip:hover::before {background-color: #f9eeb5; display: inline-block; width: auto;  position: absolute; font-size: 10px; white-space: nowrap; color: #6f6639; font-family: Verdana, Tahoma, sans-serif; font-weight: bold; border: 1px solid #827c5e; border-radius: 3px; padding: 2px 4px; box-shadow: inset 0 0 0 1px #fcf6da; pointer-events: none;}
 
-.header {width: 100%; background-color: #4096ee; display: -webkit-box; overflow: hidden;}
+
+.header {width: 100%; background-color: #4096EE; display: -webkit-box; overflow: hidden; -webkit-user-select: none;}
 
 .navbar a {width: 64px; height: 50px; float: left; overflow: hidden; font-size: 11px; text-align: center; margin-top: 10px; margin-left: 4px; font-weight: bolder; text-decoration: none; }
-.navbar .navicon {width: 32px; height: 32px; margin-bottom: 2px; display: inline-block; background-size: cover; background-repeat: no-repeat; background-position: 0px 0px;}
-.navbar a:hover .navicon, .navbar a.active .navicon {background-position:-32px 0px;}
+.navbar .navicon {width: 32px; height: 32px; display: inline-block; background-size: cover; background-repeat: no-repeat; background-position: left;}
+.navbar a:hover .navicon, .navbar a.active .navicon {background-position: right;}
 .navbar .disabled {opacity: 0.25; pointer-events: none;}
 
 .subbar {margin-left: 12px;}
 .subbar a {float: left; font-size: 16px; margin-right: 12px; margin-top: 4px; margin-bottom: 4px; font-weight: bolder; text-decoration: none; height: 16px;}
-.subbar .navicon {width: 16px; height: 16px; display: inline-block; background-size: cover; background-repeat: no-repeat; background-position: 0px 0px; margin-right:4px;}
-.subbar a:hover .navicon, .subbar a.active .navicon {background-position:-16px 0px;}
-.subbar span:not(.navicon) {vertical-align:top;}
+.subbar .navicon {width: 16px; height: 16px; display: inline-block; background-size: cover; background-repeat: no-repeat; background-position: left; margin-right:4px;}
+.subbar a:hover .navicon, .subbar a.active .navicon {background-position: right;}
+.subbar span:not(.navicon) {vertical-align: top;}
 .subbar .disabled {opacity: 0.25; pointer-events: none;}
 
 #home .navicon {background-image: url('/assets/rustmb/combined/cloudbox.png');}
@@ -39,72 +42,94 @@ form {margin-bottom: 0;}
 #pgNews .navicon {background-image: url('/assets/rustmb/combined/news.png');}
 #pgInfo .navicon {background-image: url('/assets/rustmb/combined/info.png');}
 
-#newest .navicon {background-image: url('/assets/rustmb/combined/newest.png')}
-#random .navicon {background-image: url('/assets/rustmb/combined/random.png')}
-#mostfavs .navicon {background-image: url('/assets/rustmb/combined/mostfavs.png')}
-#mostlikes .navicon {background-image: url('/assets/rustmb/combined/mostlikes.png')}
-#mostdls .navicon {background-image: url('/assets/rustmb/combined/mostdls.png')}
+#newest .navicon {background-image: url('/assets/rustmb/combined/newest.png');}
+#random .navicon {background-image: url('/assets/rustmb/combined/random.png');}
+#mostfavs .navicon {background-image: url('/assets/rustmb/combined/mostfavs.png');}
+#mostlikes .navicon {background-image: url('/assets/rustmb/combined/mostlikes.png');}
+#mostdls .navicon {background-image: url('/assets/rustmb/combined/mostdls.png');}
 
-#uploadsave .navicon {background-image: url('/assets/rustmb/combined/uploadsave.png')}
-#cleanup .navicon {background-image: url('/assets/rustmb/combined/cleanup.png')}
+#uploadsave .navicon {background-image: url('/assets/rustmb/combined/uploadsave.png');}
+#cleanup .navicon {background-image: url('/assets/rustmb/combined/cleanup.png');}
 
-#settings {cursor:pointer;}
-#settings .navicon {background-image:url('/assets/rustmb/combined/gear.png')}
+#settings {cursor: pointer;}
+#settings .navicon {background-image: url('/assets/rustmb/combined/gear.png');}
 
-#togglemode {cursor:pointer; position:absolute; top:56px; right:0; margin-right:0;}
-#togglemode .navicon {background-image:url("/assets/rustmb/combined/sunmoon.png"); width:48px; height:48px;}
-#togglemode:hover .navicon {background-position:-48px 0;}
+#togglemode {cursor: pointer; position: absolute; margin: 0; border-radius: 100%; width: 48px; height: 48px; right: 4px;}
+#togglemode .navicon {background-image: url("/assets/rustmb/combined/sunmoon.png"); width: 100%; height: 100%;}
+#togglemode:hover .navicon {background-position: right;}
+
+#togglemode:hover::before {content: "Toggle Light/Dark Mode"; right: 48px; bottom: 24px; -webkit-transform: translate(0,50%);}
 
 .search {padding: 16px; padding-bottom: 0px;}
-.search #searchbox {width: 100%; padding: 5px; border: 2px solid; border-color: #595959; border-radius: 4px;}
+.search #searchbox {width: 100%; padding: 5px; border: 2px solid; border-color: #595959; border-radius: 4px; box-sizing: border-box;}
 
-.topclouds {height: 40px; background-image: url('/svg/clouds?fill=b8e3ff'); background-color: #4096EE;}
+.topclouds {height: 40px; background-image: url('/svg/clouds?fill=B8E3FF'); background-color: #4096EE;}
 
 .savetools {padding: 16px 8px;}
 .savetools a {margin: 8px; font-weight: bolder;}
 
-.content {padding: 16px 8px; overflow-y: auto; background-color: #B8E3FF; -webkit-box-flex: 1; padding-bottom: 160px; scrollbar-color: #4096ee white;}
+.content {padding: 16px 8px; overflow-y: auto; background-color: #B8E3FF; -webkit-box-flex: 1; padding-bottom: 160px; scrollbar-color: #4096EE white;}
 
 .pillbox {background: white; -webkit-border-radius: 10px; border-radius: 10px; padding: 5px 10px; overflow: hidden; margin-left: auto; margin-right: auto; width: 92%; box-sizing: border-box;}
 .pillbox:not(:last-child) {margin-bottom: 6px;}
 .pillbox.thin {display: inline-block; margin-left: 4%; width: auto; max-width: 92%;}
 
-.pillbox h2, .pillbox h3, .pillbox h4 {color: #4096ee; margin: 0; margin-bottom: 6px; margin-top: 3px;}
-.pillbox sub {font-style: italic; margin-left: 10px; color:#333; font-weight:normal; vertical-align:baseline;}
+.pillbox h2, .pillbox h3, .pillbox h4 {color: #4096EE; margin: 0; margin-bottom: 6px; margin-top: 3px;}
+.pillbox sub {font-style: italic; margin-left: 10px; color: #333; font-weight: normal; vertical-align: baseline;}
 .pillbox div.newsformat {margin: 13px 0px; margin-bottom: 6px; font-size: 13px; white-space: pre-line;}
 
-a.morelink {width:16px; height:16px; display:inline-block; margin-left:2px; vertical-align:sub; background-size:cover; background-position:0px 0px; background-repeat:no-repeat; background-image:url("/assets/rustmb/combined/link.png");}
-a.morelink:hover {background-position:-16px 0px;}
-a.morelink.large {width:22px; height:22px;}
-a.morelink.large:hover {background-position:-22px 0px;}
+a.morelink {width: 16px; height: 16px; display: inline-block; margin-left: 2px; vertical-align: sub; background-size: cover; background-position: right; background-repeat: no-repeat; background-image: url("/assets/rustmb/combined/link.png");}
+a.morelink:hover {background-position: left;}
+a.morelink.large {width: 22px; height: 22px;}
+
+#inline-options span {background-size: cover; background-position: left; background-repeat: no-repeat; background-image: url('/assets/rustmb/combined/gear.png'); display: inline-block; width: 16px; height: 16px; vertical-align: text-top; margin-right: 3px;}
+#inline-options:hover span {background-position: right;}
+
+.newsitem:not(:last-child) {border-bottom: 1px solid #B8E3FF;}
 
 
-#morenews > div:not(:last-child) {border-bottom: 1px solid #b8e3ff;}
-
-
-.item {width: 128px; height: 125px; margin-left: 2px; margin-right: 2px; display: inline-block; cursor: pointer;}
-.item .thumb {width: 128px; height: 100px; border: 2px solid; border-color: #595959; border-radius: 4px; margin-bottom: 1px; background-position: center;}
-.item:hover .thumb {border-color: #4096EE}
+.item {width: 132px; height: 125px; display: inline-block; cursor: pointer;}
+.item .thumb {width: 128px; height: 100px; border: 2px solid; border-color: #595959; border-radius: 4px; margin-bottom: 1px; background-position: center; background-image: url("/assets/rustmb/missing.svg"); position: relative;}
+.item:hover .thumb {border-color: #4096EE;}
+.item .thumb .thumb_real {width: 100%; height: 100%; background-position: center; background-size: cover;}
 .item .name {font-size: 11px; font-weight: bolder; text-align: center; white-space: nowrap; letter-spacing: -0.1px; text-overflow: ellipsis; overflow: hidden;}
 .item:hover .name {color: #4096EE;}
 
-.item .info {position: fixed; background: rgba(255, 255, 255, 0.9); bottom: 0; left: 0; right: 0; height: 120px; opacity: 1; pointer-events: none; transition: opacity 0.2s linear, bottom 0.2s linear; -webkit-transition: opacity 0.2s linear, bottom 0.2s linear; z-index: 10;}
-.item:not(:hover) .info {opacity: 0; bottom: -120px;}
-.item .info .clouds {content: " "; height: 40px; background: url('/svg/clouds?fill=ffffff') transparent; width: 100%; position: relative; top: -40px; left: 0px; right: 0px; margin-bottom:-40px; opacity: 0.9; animation: swoosh 7.5s linear infinite; -webkit-animation: swoosh 10s linear infinite;}
-.item:not(:hover) .info .clouds {animation-play-state:paused; -webkit-animation-play-state: paused;}
+.item .favtoggle {display: none; width: 28px; height: 28px; bottom: 0; right: 0; background-image: url("/assets/rustmb/combined/fav.png"); position: absolute; background-size: cover; background-position: left;}
+.item:hover .favtoggle, .item.isfav .favtoggle {display: inline-block;}
+.item .favtoggle:hover {background-position: center;}
+.item.isfav .favtoggle:hover {background-position: right;}
 
-.metabox {margin-left: 10px; margin-right: 10px;}
+.item .favtoggle:hover::before {content: "Add to Favs"; right: 0; bottom: 28px;}
+.item.isfav .favtoggle:hover::before {content: "Remove from Favs";}
+
+
+
+.item .metabox-template {display: none;}
+
+.metabox {position: fixed; background: rgba(255, 255, 255, 0.9); bottom: 0; left: 0; right: 0; height: 120px; opacity: 1; pointer-events: none; -webkit-transition: opacity 0.2s linear, bottom 0.2s linear; z-index: 10;}
+.metabox:not(.active)  {opacity: 0.25; bottom: -120px; height: 120px; -webkit-transition-delay: 0.1s;}
+.metabox.active + .bottomclouds {bottom: 120px; opacity: 0.9; -webkit-transition-delay: 0s;}
+
+.metabox-target {margin-left: 10px; margin-right: 10px; margin-top: -10px; -webkit-transition: margin 0.2s 0s linear;}
+.metabox:not(.active) .metabox-target {margin-top: 0px; -webkit-transition-delay: 0.1s;}
 .metabox-left, .metabox-right {height: 125px;}
 .metabox-left {width: 450px; float: left;}
 .metabox-right {margin-left: 450px; margin-right: 20px;}
 
-.metabox .meta-thumb, .metabox .meta-info, .metabox .meta-desc {display: inline-block; height:125px; margin-top:-10px; position: relative; margin-left:5px; margin-right:5px; overflow: hidden; text-align: left; -webkit-box-sizing: border-box; box-sizing: border-box; vertical-align: top; font-weight: bolder;}
+.metabox .meta-thumb, .metabox .meta-info, .metabox .meta-desc {display: inline-block; height:125px; position: relative; margin-left:5px; margin-right:5px; overflow: hidden; text-align: left; box-sizing: border-box; vertical-align: top; font-weight: bolder;}
 
-.metabox .meta-thumb {width: 125px;}
-.metabox .meta-thumb .img {width:125px; height:125px; border-radius:3px; border:2px solid #595959; -webkit-box-sizing: border-box; box-sizing: border-box; background-size: contain; background-position: center;}
+.metabox .meta-thumb {width: 125px; border-radius: 3px; border: 2px solid #595959; background-size: contain; background-position: center; background-image: url('/assets/rustmb/missing.svg');}
+.metabox .meta-thumb .meta-thumb_real {width: 100%; height: 100%; background-position: center; background-size: cover;}
 
 .metabox .meta-info {width :300px;}
 .metabox .meta-info .meta-name {font-weight: bold; font-size:18px; margin-bottom: 73px; max-height: 52px; overflow: hidden;}
+
+
+.color-likes {color: #004B49;}
+.color-dislikes {color: #990036;}
+.color-dls {color: #1C20D9;}
+.color-favs {color: #B65600;}
 
 .metabox .meta-info .meta-stats {height: 20px; position: absolute; bottom: 48px; width: 100%; font-size: 13px;}
 .metabox .meta-info .meta-stats div {display: inline-block;}
@@ -122,11 +147,10 @@ a.morelink.large:hover {background-position:-22px 0px;}
 
 .saveform input {border: 2px solid; border-color: #595959; border-radius: 4px;}
 
-.bottomclouds {width: 100%; height: 40px; position: fixed; bottom: 0px; background-image: url('/svg/clouds?fill=ffffff'); opacity: 0.25; pointer-events: none;}
+.bottomclouds {width: 100%; height: 40px; position: fixed; bottom: 0px; background-image: url('/svg/clouds?fill=FFFFFF'); opacity: 0.25; pointer-events: none; -webkit-transition: opacity 0.2s 0.1s linear, bottom 0.2s 0.1s linear; z-index: 9;}
 
-.topclouds {animation: swoosh 10s linear infinite; -webkit-animation: swoosh 10s linear infinite;}
-.bottomclouds {animation: swoosh 5s linear infinite; -webkit-animation: swoosh 5s linear infinite;}
-@keyframes swoosh {0% {background-position: 318px;} 100% {background-position: 0px;}}
+.topclouds {-webkit-animation: swoosh 10s linear infinite;}
+.bottomclouds {-webkit-animation: swoosh 5s linear infinite;}
 @-webkit-keyframes swoosh {0% {background-position: 318px;} 100% {background-position: 0px;}}
 
 ::-webkit-scrollbar {background-color: #4096EE; border-radius: 4px;}
@@ -137,3 +161,32 @@ a.morelink.large:hover {background-position:-22px 0px;}
 ::-webkit-scrollbar-button:decrement:active {background-image: url('/assets/darth/scrollup_active.gif')}
 ::-webkit-scrollbar-button:increment {border-radius: 0px 0px 4px 4px; background-position: 3px 5px; background-repeat: no-repeat; background-image: url('/assets/darth/scrolldown.gif');}
 ::-webkit-scrollbar-button:increment:active {background-image: url('/assets/darth/scrolldown_active.gif')}
+
+
+
+@media (max-width: 859px) {
+	
+	.content {padding-left: 2px; padding-right: 2px;}
+	
+	.metabox-target {margin-left: 0px; margin-right: 0px;}
+	
+	.pillbox {width: 99%;}
+	
+}
+
+@media (max-width: 699px) {
+	
+	.header {display: block;}
+	
+	.header .navbar:first-child {overflow: auto; zoom: 0.85;}
+	.header .search {box-sizing: border-box; padding-top: 4px; padding-bottom: 4px; padding-left: 4px; padding-right: 102px; margin-right: -106px; display: inline-block;}
+	.header .search.search_sortrandom {padding-right: 52px; margin-right: -56px;}
+	.header .search + .navbar {overflow: auto; float: right; zoom: 0.8; position: relative;}
+	.header .search + .navbar a {margin-top: 0px; margin-left: 0px;}
+	
+	.header + .header {padding-top: 4px;}
+	
+	.header .subbar {display: inline-block; margin-left: 4px;}
+	.header .subbar a:not(#togglemode) {zoom: 0.85;}
+	.header .subbar + .subbar {float: right;}
+}
