@@ -78,7 +78,7 @@ function ExecuteCloudboxPackage(info)
 				if map then break end
 			end
 
-			RunConsoleCommand("changelevel", map)
+			RunConsoleCommand("changelevel", "\"" .. map .. "\"")
 		end
 	end
 
