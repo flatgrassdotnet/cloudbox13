@@ -254,9 +254,6 @@ CloudboxScriptReplacements = {
 	// surface.DrawTexturedRectUV parameters have changed
 	["surface.DrawTexturedRectUV%s*%("] = "DrawTexturedRectUVCloudbox%(",
 
-	// Get a Normalized vector instead of changing it to Normalized
-	[":Normalize%(%)"] = ":GetNormalized%(%)",
-
 	// Use ACT_GMOD_GESTURE_ITEM_PLACE for ACT_ITEM_PLACE
 	["([,%(])%s*ACT_ITEM_PLACE%s*([,%)])"] = " %1 ACT_GMOD_GESTURE_ITEM_PLACE %2 ",
 
