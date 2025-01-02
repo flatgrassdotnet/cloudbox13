@@ -21,6 +21,8 @@ local cIMaterial = FindMetaTable("IMaterial")
 local cPlayer = FindMetaTable("Player")
 local cWeapon = FindMetaTable("Weapon")
 local cParticle = FindMetaTable("CLuaParticle")
+local cAngle = FindMetaTable("Angle")
+local cVector = FindMetaTable("Vector")
 
 // "KeyValuesToTable and TableToKeyValues are now in the util library"
 KeyValuesToTable = util.KeyValuesToTable
@@ -196,6 +198,16 @@ function HookAddCloudbox(eventName, identifier, func)
 	hook.Add(eventName, identifier, func)
 end
 
+function cAngle:NormalizeCloudbox()
+	self:Normalize()
+	return self
+end
+
+function cVector:NormalizeCloudbox()
+	self:Normalize()
+	return self
+end
+
 CloudboxScriptReplacements = {
 	// "Entity:SetColor and Entity:GetColor now deal with Colors only"
 	[":SetColor%s*%("] = ":SetColorCloudbox%(",
@@ -294,7 +306,10 @@ CloudboxScriptReplacements = {
 	["\"models/items/tf/plate%.mdl\""] = "\"models/items/plate.mdl\"",
 
 	// SetMaterial doesn't take a Material object
-	[":SetMaterial%s*%(%s*Material%s*%(%s*\"([%w_/]+)\"%s*%)%s*%)"] = ":SetMaterial%( \"%1\" %)"
+	[":SetMaterial%s*%(%s*Material%s*%(%s*\"([%w_/]+)\"%s*%)%s*%)"] = ":SetMaterial%( \"%1\" %)",
+
+	// Normalize no longer returns a value
+	[":Normalize%(%)"] = ":NormalizeCloudbox%(%)"
 }
 
 // "stopsounds" is now "stopsound"
