@@ -187,12 +187,7 @@ function HookAddCloudbox(eventName, identifier, func)
 	// Arguments 'ent,inflictor,attacker,amount,dmginfo' have been collapsed to just 'ent,dmginfo'.
 	if eventName == "EntityTakeDamage" then
 		local hooked = func
-		func = function(ent, dmginfo)
-			inflictor = dmginfo:GetInflictor()
-			attacker = dmginfo:GetAttacker()
-			amount = dmginfo:GetDamage()
-			return hooked(ent, inflictor, attacker, amount, dmginfo)
-		end
+		func = function(ent, dmginfo) return hooked(ent, dmginfo:GetInflictor(), dmginfo:GetAttacker(), dmginfo:GetDamage(), dmginfo) end
 	end
 
 	hook.Add(eventName, identifier, func)
