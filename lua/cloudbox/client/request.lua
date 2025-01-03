@@ -54,7 +54,7 @@ net.Receive("CloudboxServerDownloadRequest", function()
 	// register
 	ActiveCloudboxDownloads[info["id"]] = {["info"] = info, ["requester"] = requester}
 
-	if !game.SinglePlayer then
+	if !game.SinglePlayer() then
 		notification.AddProgress("CloudboxPackageDownload" .. info["id"], "Downloading \"" .. info["name"] .. "\"")
 
 		timer.Create("CloudboxNotificationKiller" .. info["id"], 30, 1, function()
@@ -69,13 +69,13 @@ net.Receive("CloudboxServerDownloadProgress", function()
 	local id = net.ReadUInt(32)
 	local progress = net.ReadFloat()
 
-	if !game.SinglePlayer then
+	if !game.SinglePlayer() then
 		notification.AddProgress("CloudboxPackageDownload" .. id, "Downloading \"" .. ActiveCloudboxDownloads[id]["info"]["name"] .. "\"", progress)
 	end
 
 	if progress != 1 then return end
 
-	if !game.SinglePlayer then
+	if !game.SinglePlayer() then
 		notification.Kill("CloudboxPackageDownload" .. id)
 		timer.Remove("CloudboxNotificationKiller" .. id)
 	end
