@@ -13,6 +13,4 @@ function ENT:Initialize()
 	
 	self:SharedInitialize()
 	
-	self.Entity:SetShouldDrawInViewMode( true )
-	
 end

@@ -129,6 +129,14 @@ function EmitSoundCloudbox(soundName, ...)
 	EmitSound(soundName, ...)
 end
 
+function LerpCloudbox(t, from, to)
+	// Fix scripts providing non-numerical values
+	if !isnumber(t) then t = 0 end
+	if !isnumber(from) then from = 0 end
+	if !isnumber(to) then to = 0 end
+	return Lerp(t, from, to)
+end
+
 function CreateFontCloudbox(font_name, size, weight, antialiasing, additive, new_font_name, drop_shadow, outlined, blur)
 	surface.CreateFont(new_font_name, {
 		font = font_name,
@@ -177,6 +185,11 @@ end
 
 function cWeapon:DefaultReloadCloudbox(act)
 	return self:DefaultReload(act or ACT_VM_RELOAD)
+end
+
+function pairsCloudbox(tab)
+	if !istable(tab) then tab = {} end
+	return pairs(tab)
 end
 
 function HookAddCloudbox(eventName, identifier, func)
@@ -253,6 +266,7 @@ CloudboxScriptReplacements = {
 	["\"ScoreboardText\""] = "\"ScoreboardDefault\"",
 	["\"HUDNumber\""] = "\"HUDNumbers\"",
 	["\"TitleFont2\""] = "\"ClientTitleFont\"",
+	["\"De_Tips\""] = "\"Trebuchet24\"",
 
 	// DSysButton was removed in favour of native closing. To prevent errors, replace with a normal button
 	["\"DSysButton\""] = "\"DButton\"",
@@ -304,7 +318,17 @@ CloudboxScriptReplacements = {
 	[":SetMaterial%s*%(%s*Material%s*%(%s*\"([%w_/]+)\"%s*%)%s*%)"] = ":SetMaterial%( \"%1\" %)",
 
 	// Normalize no longer returns a value
-	[":Normalize%(%)"] = ":NormalizeCloudbox%(%)"
+	[":Normalize%(%)"] = ":NormalizeCloudbox%(%)",
+	
+	// Fix some scripts providing non-numerical values to Lerp. Global Lerp only.
+	["%sLerp%s*%("] = " LerpCloudbox%(",
+	
+	// 180179 "Pixel Weapon"
+	["colorPnl:GetTable%(%)%.AlphaBar:GetTable%(%)%.imgBackground%.Paint = function%(%) end"] = "",
+	
+	// pairs breaks when provided with nil
+	["%spairs%s*%("] = " pairsCloudbox%("
+	
 }
 
 // "stopsounds" is now "stopsound"
