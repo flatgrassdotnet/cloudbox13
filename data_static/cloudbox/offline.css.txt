@@ -1,8 +1,11 @@
+@supports (width: calc(1px + 1px)) { /* Hack to prevent awesomium using the -webkit-mask-box-image as it impacts Awesomium rendering */
+	html {-webkit-mask-box-image: url("asset://garrysmod/materials/cloudbox/mask-4.png") 4;}
+}
 html,body {-webkit-user-select: none;}
 
 .header {height: 86px; -webkit-box-pack: justify;}
 
-.topclouds {background-image: url("asset://garrysmod/materials/cloudbox/clouds.png");}
+#topclouds {background-image: url("asset://garrysmod/materials/cloudbox/clouds.png");}
 
 #offlinenote {margin-top: 10px; padding: 3px 5px; margin-left: 10px; background-color: #FFE292; color: black; display: inline-block; font-size: 13px;}
 #offlinenote p {margin-top: 3px; margin-bottom: 3px; }

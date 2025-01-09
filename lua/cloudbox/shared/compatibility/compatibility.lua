@@ -187,6 +187,12 @@ function cWeapon:DefaultReloadCloudbox(act)
 	return self:DefaultReload(act or ACT_VM_RELOAD)
 end
 
+function cWeapon:SetWeaponHoldTypeCloudbox(t)
+	t = t or "normal"
+	
+	self:SetWeaponHoldType(t)
+end
+
 function pairsCloudbox(tab)
 	if !istable(tab) then tab = {} end
 	return pairs(tab)
@@ -327,7 +333,10 @@ CloudboxScriptReplacements = {
 	["colorPnl:GetTable%(%)%.AlphaBar:GetTable%(%)%.imgBackground%.Paint = function%(%) end"] = "",
 	
 	// pairs breaks when provided with nil
-	["%spairs%s*%("] = " pairsCloudbox%("
+	["%spairs%s*%("] = " pairsCloudbox%(",
+	
+	// SetWeaponHoldType can't accept nil
+	[":SetWeaponHoldType%s*%("] = ":SetWeaponHoldTypeCloudbox%("
 	
 }
 

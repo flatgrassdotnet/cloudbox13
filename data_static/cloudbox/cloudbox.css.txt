@@ -1,6 +1,8 @@
-html, body {background-color: transparent;}
-html {height: 100%;}
-body {height: 100%; margin: 0px; font-family: Helvetica; color: #333; display: -webkit-box; -webkit-box-orient: vertical; accent-color: #4096ee;}
+html, body {background-color: transparent; height: 100%;}
+@supports (width: calc(1px + 1px)) { /* Hack to prevent awesomium using the -webkit-mask-box-image as it impacts Awesomium rendering */
+	html.gm13 {-webkit-mask-box-image: url("/assets/darth/mask-4.png") 4;}
+}
+body {margin: 0px; font-family: Helvetica; color: #333; display: -webkit-box; -webkit-box-orient: vertical; accent-color: #4096ee;}
 a {color: #333; text-decoration: none;}
 a:hover {color: #FFF;}
 h1 {margin-left: 10px;}
@@ -8,10 +10,28 @@ a.textlink {font-weight: bold; cursor: pointer;}
 a.textlink:hover {color: #4096EE;}
 form {margin-bottom: 0;}
 
-.hastooltip:hover::before {background-color: #f9eeb5; display: inline-block; width: auto;  position: absolute; font-size: 10px; white-space: nowrap; color: #6f6639; font-family: Verdana, Tahoma, sans-serif; font-weight: bold; border: 1px solid #827c5e; border-radius: 3px; padding: 2px 4px; box-shadow: inset 0 0 0 1px #fcf6da; pointer-events: none;}
+/* tooltips */
+.tooltip, [tooltip]:hover::before {background-color: #f9eeb5; display: inline-block; width: auto; font-size: 10px; white-space: nowrap; color: #6f6639; font-family: Verdana, Tahoma, sans-serif; font-weight: bold; border: 1px solid #827c5e; border-radius: 3px; padding: 2px 4px; box-shadow: inset 0 0 0 1px #fcf6da;} /* common for inline and hover tooltip */
+[tooltip]:hover::before {position: absolute; pointer-events: none; content: attr(tooltip); z-index: 100; } /* hover tooltips */
+.tt_topleft[tooltip]:hover::before, .tt_top[tooltip]:hover::before, .tt_topright[tooltip]:hover::before {top: -5px; -webkit-transform: translateY(-100%);} /* top */
+.tt_bottomleft[tooltip]:hover::before, .tt_bottom[tooltip]:hover::before, .tt_bottomright[tooltip]:hover::before {bottom: -5px;  -webkit-transform: translateY(100%);} /* bottom */
+.tt_top[tooltip]:hover::before {left: 50%; -webkit-transform: translate(-50%, -100%); text-align: center;} /* top-middle */
+.tt_bottom[tooltip]:hover::before {left: 50%; -webkit-transform: translate(-50%, 100%); text-align: center;} /* bottom-middle */
+.tt_topleft[tooltip]:hover::before, .tt_bottomleft[tooltip]:hover::before {right: 0; text-align: right;} /* left (top/bottom) */
+.tt_topright[tooltip]:hover::before, .tt_bottomright[tooltip]:hover::before {left: 0; text-align: left;} /* right (top/bottom) */
+.tt_left[tooltip]:hover::before {left: -5px; top: 50%; -webkit-transform: translate(-100%, -50%); text-align: right;}  /* left (center) */
+.tt_right[tooltip]:hover::before {right: -5px; top: 50%; -webkit-transform: translate(100%, -50%); text-align: left;} /* right (center) */
 
 
-.header {width: 100%; background-color: #4096EE; display: -webkit-box; overflow: hidden; -webkit-user-select: none;}
+
+.header {width: 100%; display: -webkit-box; overflow: hidden; -webkit-user-select: none;  background-color: #4096EE;}
+
+#header_primary {}
+#header_secondary {-webkit-box-pack: justify; padding-bottom: 2px;}
+
+.clouds {height: 40px; width: 100%; pointer-events: none; -webkit-animation: clouds 0s linear infinite;}
+#topclouds {background-image: url("/svg/clouds?fill=B8E3FF"); -webkit-animation-duration: 10s;  background-color: #4096EE;}
+#bottomclouds {position: fixed; bottom: 0px; background-image: url("/svg/clouds?fill=FFFFFF"); opacity: 0.25; -webkit-transition: opacity 0.2s 0.1s linear, bottom 0.2s 0.1s linear; z-index: 200; -webkit-animation-duration: 5s;}
 
 .navbar a {width: 64px; height: 50px; float: left; overflow: hidden; font-size: 11px; text-align: center; margin-top: 10px; margin-left: 4px; font-weight: bolder; text-decoration: none; }
 .navbar .navicon {width: 32px; height: 32px; display: inline-block; background-size: cover; background-repeat: no-repeat; background-position: left;}
@@ -44,9 +64,7 @@ form {margin-bottom: 0;}
 
 #newest .navicon {background-image: url('/assets/rustmb/combined/newest.png');}
 #random .navicon {background-image: url('/assets/rustmb/combined/random.png');}
-#mostfavs .navicon {background-image: url('/assets/rustmb/combined/mostfavs.png');}
-#mostlikes .navicon {background-image: url('/assets/rustmb/combined/mostlikes.png');}
-#mostdls .navicon {background-image: url('/assets/rustmb/combined/mostdls.png');}
+#popular .navicon {background-image: url('/assets/rustmb/combined/popular.png');}
 
 #uploadsave .navicon {background-image: url('/assets/rustmb/combined/uploadsave.png');}
 #cleanup .navicon {background-image: url('/assets/rustmb/combined/cleanup.png');}
@@ -54,16 +72,15 @@ form {margin-bottom: 0;}
 #settings {cursor: pointer;}
 #settings .navicon {background-image: url('/assets/rustmb/combined/gear.png');}
 
-#togglemode {cursor: pointer; position: absolute; margin: 0; border-radius: 100%; width: 48px; height: 48px; right: 4px;}
+#togglemode {cursor: pointer; position: absolute; margin: 0; border-radius: 100%; width: 48px; height: 48px; right: 4px; }
 #togglemode .navicon {background-image: url("/assets/rustmb/combined/sunmoon.png"); width: 100%; height: 100%;}
 #togglemode:hover .navicon {background-position: right;}
 
-#togglemode:hover::before {content: "Toggle Light/Dark Mode"; right: 48px; bottom: 24px; -webkit-transform: translate(0,50%);}
 
 .search {padding: 16px; padding-bottom: 0px;}
 .search #searchbox {width: 100%; padding: 5px; border: 2px solid; border-color: #595959; border-radius: 4px; box-sizing: border-box;}
 
-.topclouds {height: 40px; background-image: url('/svg/clouds?fill=B8E3FF'); background-color: #4096EE;}
+
 
 .savetools {padding: 16px 8px;}
 .savetools a {margin: 8px; font-weight: bolder;}
@@ -88,10 +105,13 @@ a.morelink.large {width: 22px; height: 22px;}
 .newsitem:not(:last-child) {border-bottom: 1px solid #B8E3FF;}
 
 
+.thumb {width: 100%; height: 100%; border: 2px solid #595959; border-radius: 4px; background-position: center; background-image: url("/assets/rustmb/missing.svg");}
+.thumb .thumb_real {width: 100%; height: 100%; background-position: center; background-size: cover;}
+
+
 .item {width: 132px; height: 125px; display: inline-block; cursor: pointer;}
-.item .thumb {width: 128px; height: 100px; border: 2px solid; border-color: #595959; border-radius: 4px; margin-bottom: 1px; background-position: center; background-image: url("/assets/rustmb/missing.svg"); position: relative;}
+.item .thumb {width: 128px; height: 100px; margin-bottom: 1px; position: relative;}
 .item:hover .thumb {border-color: #4096EE;}
-.item .thumb .thumb_real {width: 100%; height: 100%; background-position: center; background-size: cover;}
 .item .name {font-size: 11px; font-weight: bolder; text-align: center; white-space: nowrap; letter-spacing: -0.1px; text-overflow: ellipsis; overflow: hidden;}
 .item:hover .name {color: #4096EE;}
 
@@ -100,30 +120,28 @@ a.morelink.large {width: 22px; height: 22px;}
 .item .favtoggle:hover {background-position: center;}
 .item.isfav .favtoggle:hover {background-position: right;}
 
-.item .favtoggle:hover::before {content: "Add to Favs"; right: 0; bottom: 28px;}
+.item .favtoggle:hover::before {content: "Add to Favs";}
 .item.isfav .favtoggle:hover::before {content: "Remove from Favs";}
 
 
 
 .item .metabox-template {display: none;}
 
-.metabox {position: fixed; background: rgba(255, 255, 255, 0.9); bottom: 0; left: 0; right: 0; height: 120px; opacity: 1; pointer-events: none; -webkit-transition: opacity 0.2s linear, bottom 0.2s linear; z-index: 10;}
+.metabox {position: fixed; background: rgba(255, 255, 255, 0.9); bottom: 0; left: 0; right: 0; height: 120px; opacity: 1; pointer-events: none; -webkit-transition: opacity 0.2s linear, bottom 0.2s linear; z-index: 201;}
 .metabox:not(.active)  {opacity: 0.25; bottom: -120px; height: 120px; -webkit-transition-delay: 0.1s;}
-.metabox.active + .bottomclouds {bottom: 120px; opacity: 0.9; -webkit-transition-delay: 0s;}
+.metabox.active + #bottomclouds {bottom: 120px; opacity: 0.9; -webkit-transition-delay: 0s;}
 
-.metabox-target {margin-left: 10px; margin-right: 10px; margin-top: -10px; -webkit-transition: margin 0.2s 0s linear;}
+.metabox-target {margin-left: 10px; margin-right: 10px; margin-top: -10px; -webkit-transition: margin 0.2s 0s linear; display: -webkit-box; -webkit-box-orient: horizontal; height: 125px;}
 .metabox:not(.active) .metabox-target {margin-top: 0px; -webkit-transition-delay: 0.1s;}
-.metabox-left, .metabox-right {height: 125px;}
-.metabox-left {width: 450px; float: left;}
-.metabox-right {margin-left: 450px; margin-right: 20px;}
 
-.metabox .meta-thumb, .metabox .meta-info, .metabox .meta-desc {display: inline-block; height:125px; position: relative; margin-left:5px; margin-right:5px; overflow: hidden; text-align: left; box-sizing: border-box; vertical-align: top; font-weight: bolder;}
 
-.metabox .meta-thumb {width: 125px; border-radius: 3px; border: 2px solid #595959; background-size: contain; background-position: center; background-image: url('/assets/rustmb/missing.svg');}
-.metabox .meta-thumb .meta-thumb_real {width: 100%; height: 100%; background-position: center; background-size: cover;}
+.metabox .meta-col {margin-left:5px; margin-right:5px; overflow: hidden; box-sizing: border-box; font-weight: bolder;}
 
-.metabox .meta-info {width :300px;}
-.metabox .meta-info .meta-name {font-weight: bold; font-size:18px; margin-bottom: 73px; max-height: 52px; overflow: hidden;}
+.metabox .thumb {width: 125px;}
+
+.metabox .meta-info {width: 300px; display: -webkit-box; -webkit-box-orient: vertical; font-size: 13px;}
+.metabox .meta-info .meta-row {width: 100%;}
+.metabox .meta-info .meta-name {font-weight: bold; font-size: 18px; overflow: hidden; -webkit-box-flex: 1;}
 
 
 .color-likes {color: #004B49;}
@@ -131,27 +149,26 @@ a.morelink.large {width: 22px; height: 22px;}
 .color-dls {color: #1C20D9;}
 .color-favs {color: #B65600;}
 
-.metabox .meta-info .meta-stats {height: 20px; position: absolute; bottom: 48px; width: 100%; font-size: 13px;}
+.metabox .meta-info .meta-stats {padding-bottom: 4px;}
 .metabox .meta-info .meta-stats div {display: inline-block;}
 .metabox .meta-info .meta-stats div:not(:last-child) {margin-right: 12px;}
 .metabox .meta-info .meta-stats div img {height: 16px; vertical-align: bottom; margin-right: 4px;}
 
-.metabox .meta-info .meta-user {height: 48px; position: absolute; bottom: 0; width: 100%;}
-.metabox .meta-info .meta-user img {width: 48px; height: 48px; float: left;}
-.metabox .meta-info .meta-user .meta-uploaded, .metabox .meta-info .meta-user .meta-username {font-size: 13px; margin-left: 48px; padding-left: 8px; line-height: 24px;}
+.metabox .meta-info .meta-user {}
+.metabox .meta-info .meta-user img {width: 48px; height: 48px; float: left; margin-right: 8px; }
+.metabox .meta-info .meta-user > div {line-height: 24px; }
 
-.metabox .meta-desc {background: rgba(184, 227, 255, 0.6); padding: 10px; font-size: 15px; border-radius: 8px; width: 100%; white-space: collapse;}
+.metabox .meta-desc {background: rgba(184, 227, 255, 0.6); padding: 10px; font-size: 15px; border-radius: 8px; -webkit-box-flex: 1; white-space: collapse; margin-right: 15px;}
 
 .saveform {padding: 16px 8px;}
 .saveform label {display: block;}
 
 .saveform input {border: 2px solid; border-color: #595959; border-radius: 4px;}
 
-.bottomclouds {width: 100%; height: 40px; position: fixed; bottom: 0px; background-image: url('/svg/clouds?fill=FFFFFF'); opacity: 0.25; pointer-events: none; -webkit-transition: opacity 0.2s 0.1s linear, bottom 0.2s 0.1s linear; z-index: 9;}
 
-.topclouds {-webkit-animation: swoosh 10s linear infinite;}
-.bottomclouds {-webkit-animation: swoosh 5s linear infinite;}
-@-webkit-keyframes swoosh {0% {background-position: 318px;} 100% {background-position: 0px;}}
+
+
+@-webkit-keyframes clouds {0% {background-position: 318px;} 100% {background-position: 0px;}}
 
 ::-webkit-scrollbar {background-color: #4096EE; border-radius: 4px;}
 ::-webkit-scrollbar-button, ::-webkit-scrollbar-thumb {background-color: white; border: 2px solid #595959;}
@@ -184,7 +201,7 @@ a.morelink.large {width: 22px; height: 22px;}
 	.header .search + .navbar {overflow: auto; float: right; zoom: 0.8; position: relative;}
 	.header .search + .navbar a {margin-top: 0px; margin-left: 0px;}
 	
-	.header + .header {padding-top: 4px;}
+	#header_secondary {padding-top: 4px;}
 	
 	.header .subbar {display: inline-block; margin-left: 4px;}
 	.header .subbar a:not(#togglemode) {zoom: 0.85;}

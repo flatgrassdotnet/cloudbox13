@@ -30,7 +30,7 @@ function LoadCloudboxOffline(panel)
 	local cachedFiles = file.Find("cloudbox/downloads/*.json", "DATA")
 	for _, filename in pairs(cachedFiles) do
 		local meta = util.JSONToTable(file.Read("cloudbox/downloads/" .. filename))
-		local str = "<a onclick='cloudbox.GetPackage(\"offline\", " .. tonumber(meta["id"]) .. "  ,  " .. tonumber(meta["rev"]) .. " )' class='item'><div class='thumb' style=\"background-image:url('http://img.cl0udb0x.com/" .. tonumber(meta["id"]) .. "_thumb_128.png'), url(&quot;asset://garrysmod/materials/cloudbox/missing.png&quot;)\"></div><div class='name'>" .. string.gsub(meta["name"], "[><]", "") .. "</div></a>"
+		local str = "<a onclick='cloudbox.GetPackage(\"offline\", " .. tonumber(meta["id"]) .. "  ,  " .. tonumber(meta["rev"]) .. ")' class='item'><div class='thumb' style=\"background-image:url('http://img.cl0udb0x.com/" .. tonumber(meta["id"]) .. "_thumb_128.png'), url(&quot;asset://garrysmod/materials/cloudbox/missing.png&quot;)\"></div><div class='name'>" .. string.gsub(meta["name"], "[><]", "") .. "</div></a>"
 
 		if meta["type"] == "map" then
 			fallbackCatsList.map = fallbackCatsList.map .. str
@@ -56,7 +56,8 @@ function LoadCloudboxOffline(panel)
 
 	local html = vgui.Create("DHTML", panel)
 	html:Dock(FILL)
-	html:SetHTML("<html><head><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox-dark.css.txt' type='text/css' " .. darkCSS .. "><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline-dark.css.txt' type='text/css' " .. darkCSS .. "></head><body><div class='header'><div id='offlinenote'><p>You are in offline mode. Browse cached downloads or click Reconnect to go online.</p></div><div class='navbar'><a id='retry' onclick='cloudbox.RetryOnline(); return false;' href=\"javascript:void(0);\"><div class='navicon'></div><br>Reconnect</a></div></div><div class='topclouds'></div><div class='content'><div class='column_container'>" .. fallbackContent .. "</div></div></body></html>")
+	html:SetHTML("<html><head><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox-dark.css.txt' type='text/css' " .. darkCSS .. "><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline-dark.css.txt' type='text/css' " .. darkCSS .. "></head><body><div class='header'><div id='offlinenote'><p>You are in offline mode. Browse cached downloads or click Reconnect to go online.</p></div><div class='navbar'><a id='retry' onclick='cloudbox.RetryOnline(); return false;' href=\"javascript:void(0);\"><div class='navicon'></div><br>Reconnect</a></div></div><div class='clouds' id='topclouds'></div><div class='content'><div class='column_container'>" .. fallbackContent .. "</div></div></body></html>")
+	html:DockMargin(1,1,1,1)
 	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
 	html:AddFunction("cloudbox", "RetryOnline", function()
 		local spnMenu = panel:GetParent()
@@ -76,16 +77,18 @@ function AddCloudboxTab()
 
 	-- Blue background container
 	local panel = vgui.Create("DPanel")
-	function panel:Paint( w, h )
-		draw.RoundedBox( 0, 0, 0, w, h, Color(184, 227, 255, 255) )
+	panel:SetBackgroundColor(Color(184, 227, 255, 255))
+	function panel:Paint(w, h)
+		derma.SkinHook("Paint", "CategoryList", self, w, h)
+		return false
 	end
 
 	-- Loading spinner
 	local spinner = vgui.Create("DPanel", panel)
-	local spinnerImg = Material( "cloudbox/loading.png", "noclamp smooth" )
+	local spinnerImg = Material("cloudbox/loading.png", "noclamp smooth")
 	local isSpinning = true
-	spinner:SetSize( 78, 78 )
-	function spinner:Paint( w, h )
+	spinner:SetSize(78, 78)
+	function spinner:Paint(w, h)
 		if isSpinning then
 			surface.SetDrawColor(color_white)
 			surface.SetMaterial(spinnerImg)
@@ -99,8 +102,8 @@ function AddCloudboxTab()
 
 	-- Fallback panel
 	local container = vgui.Create("DPanel", panel)
-	function container:Paint( w, h )
-		draw.RoundedBox( 8, 0, 0, w, h, Color(255, 255, 255, 255) )
+	function container:Paint(w, h)
+		draw.RoundedBox(8, 0, 0, w, h, Color(255, 255, 255, 255))
 	end
 	container:InvalidateLayout(true)
 	container:SetSize(400,95)
@@ -174,6 +177,7 @@ function AddCloudboxTab()
 	html:Dock(FILL)
 	html:OpenURL("https://safe.cl0udb0x.com")
 	html:SetVisible(false)
+	html:DockMargin(1,1,1,1)
 
 	html.Paint = function() return false end
 
