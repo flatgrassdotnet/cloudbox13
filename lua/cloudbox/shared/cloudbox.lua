@@ -55,7 +55,7 @@ function ExecuteCloudboxPackage(info)
 
 		scripted_ents.Register(ENT, classname)
 
-		ENT = nil
+		//ENT = nil
 	elseif info["type"] == "weapon" then
 		SWEP = {
 			Primary = {},
@@ -69,7 +69,7 @@ function ExecuteCloudboxPackage(info)
 
 		weapons.Register(SWEP, classname)
 
-		SWEP = nil
+		//SWEP = nil
 	elseif info["type"] == "map" then
 		if SERVER then
 			local map = ""
