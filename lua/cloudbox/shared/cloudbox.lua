@@ -47,12 +47,12 @@ function ExecuteCloudboxPackage(info)
 
 	if info["type"] == "entity" then
 		script = "local ENT = {}\nlocal BASE_ENT = ENT\n" .. script
-		script = script .. "\nENT.Spawnable = true\nENT.AdminSpawnable = true\nscripted_ents.Register(BASE_ENT, \"" .. classname .. "\")"
+		script = script .. "\nBASE_ENT.Spawnable = true\nBASE_ENT.AdminSpawnable = true\nscripted_ents.Register(BASE_ENT, \"" .. classname .. "\")"
 
 		RunString(script)
 	elseif info["type"] == "weapon" then
 		script = "local SWEP = {Primary = {}, Secondary = {}}\nlocal BASE_SWEP = SWEP\n" .. script
-		script = script .. "\nSWEP.Spawnable = true\nSWEP.AdminSpawnable = true\nweapons.Register(BASE_SWEP, \"" .. classname .. "\")"
+		script = script .. "\nBASE_SWEP.Spawnable = true\nBASE_SWEP.AdminSpawnable = true\nweapons.Register(BASE_SWEP, \"" .. classname .. "\")"
 
 		RunString(script)
 	elseif info["type"] == "map" then
