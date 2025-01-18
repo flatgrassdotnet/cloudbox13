@@ -45,6 +45,8 @@ function ExecuteCloudboxPackage(info)
 	// execute script / change map
 	local classname = "toybox_" .. info["id"]
 
+	// the ENT/SWEP tables are intentionally NOT cleared after registering
+	// some scripts improperly rely on these tables to still exist
 	if info["type"] == "entity" then
 		ENT = {}
 
