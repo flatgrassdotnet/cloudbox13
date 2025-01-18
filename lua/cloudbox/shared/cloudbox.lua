@@ -46,15 +46,23 @@ function ExecuteCloudboxPackage(info)
 	local classname = "toybox_" .. info["id"]
 
 	if info["type"] == "entity" then
-		script = "local ENT = {}\nlocal BASE_ENT = ENT\n" .. script
-		script = script .. "\nBASE_ENT.Spawnable = true\nBASE_ENT.AdminSpawnable = true\nscripted_ents.Register(BASE_ENT, \"" .. classname .. "\")"
+		ENT = {}
 
 		RunString(script)
+
+		ENT.Spawnable = true
+		ENT.AdminSpawnable = true
+
+		scripted_ents.Register(ENT, classname)
 	elseif info["type"] == "weapon" then
-		script = "local SWEP = {Primary = {}, Secondary = {}}\nlocal BASE_SWEP = SWEP\n" .. script
-		script = script .. "\nBASE_SWEP.Spawnable = true\nBASE_SWEP.AdminSpawnable = true\nweapons.Register(BASE_SWEP, \"" .. classname .. "\")"
+		SWEP = {Primary = {}, Secondary = {}}
 
 		RunString(script)
+
+		SWEP.Spawnable = true
+		SWEP.AdminSpawnable = true
+
+		weapons.Register(SWEP, classname)
 	elseif info["type"] == "map" then
 		if SERVER then
 			local map = ""
