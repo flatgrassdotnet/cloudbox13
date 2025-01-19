@@ -188,9 +188,11 @@ function cWeapon:DefaultReloadCloudbox(act)
 end
 
 function cWeapon:SetWeaponHoldTypeCloudbox(t)
-	t = t or "normal"
-	
-	self:SetWeaponHoldType(t)
+	self:SetWeaponHoldType(t or "normal")
+end
+
+function cWeapon:SetDeploySpeedCloudbox(speed)
+	self:SetDeploySpeed(speed or GetConVar("sv_defaultdeployspeed"):GetFloat())
 end
 
 function pairsCloudbox(tab)
@@ -336,7 +338,10 @@ CloudboxScriptReplacements = {
 	["%spairs%s*%("] = " pairsCloudbox%(",
 	
 	// SetWeaponHoldType can't accept nil
-	[":SetWeaponHoldType%s*%("] = ":SetWeaponHoldTypeCloudbox%("
+	[":SetWeaponHoldType%s*%("] = ":SetWeaponHoldTypeCloudbox%(",
+	
+	// SetDeploySpeed can't accept nil
+	[":SetDeploySpeed%s*%("] = ":SetDeploySpeedCloudbox%(",
 	
 }
 

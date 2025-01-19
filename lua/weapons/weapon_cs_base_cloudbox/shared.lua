@@ -66,7 +66,7 @@ function SWEP:Initialize()
 		self:SetNPCFireRate( 0.01 )
 	end
 	
-	self:SetWeaponHoldType( self.HoldType )
+	self:SetWeaponHoldTypeCloudbox( self.HoldType )
 	self.Weapon:SetNetworkedBool( "Ironsights", false )
 	
 end
