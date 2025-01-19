@@ -19,13 +19,17 @@
 ActiveCloudboxDownloads = {}
 
 function GetCloudboxDownloadProgress(id)
+	local total = 0
 	local done = 0
 
 	for _, finished in pairs(ActiveCloudboxDownloads[id]["downloaders"]) do
-		if finished then done = done + 1 end
+		total = total + 1
+		if finished then
+			done = done + 1
+		end
 	end
 
-	return done / #ActiveCloudboxDownloads[id]["downloaders"]
+	return done / total
 end
 
 function BroadcastCloudboxPackageDownload(info, requester)
