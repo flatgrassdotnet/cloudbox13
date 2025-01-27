@@ -111,13 +111,15 @@ function cEntity:SetModelScaleCloudbox(vector)
 	self:SetModelScale((x + y + z) / 3)
 end
 
-function cEntity:EmitSoundCloudbox(soundName, ...)
+function cEntity:EmitSoundCloudbox(soundName, soundLevel, pitchPercent, volume, channel, soundFlags, dsp, filter)
+	
 	// TF2 Fix
 	if string.EndsWith(soundName, ".wav") and not file.Exists("sound/" .. soundName, "GAME") and file.Exists("sound/" .. string.Replace(soundName, ".wav", ".mp3"), "GAME") then
 		soundName = string.Replace(soundName, ".wav", ".mp3")
 	end
 
-	self:EmitSound(soundName, ...)
+	// Using defaults, except channel which will use CHAN_AUTO to make sure weapons sound as in GM12
+	self:EmitSound(soundName, soundLevel or 75, pitchPercent or 100, volume or 1, channel or CHAN_AUTO, soundFlags or 0, dsp or 0, filter or nil)
 end
 
 function EmitSoundCloudbox(soundName, ...)
@@ -296,7 +298,7 @@ CloudboxScriptReplacements = {
 	// Update RENDERGROUP enums
 	["([,%(])%s*RENDER_GROUP_VIEW_MODEL_OPAQUE%s*([,%)])"] = " %1 RENDERGROUP_VIEWMODEL %2 ",
 
-	// EmitSound fix for TF2
+	// EmitSound fix for TF2, and other sound issues
 	[":EmitSound%s*%("] = ":EmitSoundCloudbox%(",
 	["EmitSound%s*%("] = "EmitSoundCloudbox%(",
 
