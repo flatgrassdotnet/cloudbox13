@@ -133,9 +133,9 @@ end
 
 function LerpCloudbox(t, from, to)
 	// Fix scripts providing non-numerical values
-	if !isnumber(t) then t = 0 end
-	if !isnumber(from) then from = 0 end
-	if !isnumber(to) then to = 0 end
+	if not isnumber(t) then t = 0 end
+	if not isnumber(from) then from = 0 end
+	if not isnumber(to) then to = 0 end
 	return Lerp(t, from, to)
 end
 
@@ -198,7 +198,7 @@ function cWeapon:SetDeploySpeedCloudbox(speed)
 end
 
 function pairsCloudbox(tab)
-	if !istable(tab) then tab = {} end
+	if not istable(tab) then tab = {} end
 	return pairs(tab)
 end
 
@@ -344,7 +344,6 @@ CloudboxScriptReplacements = {
 	
 	// SetDeploySpeed can't accept nil
 	[":SetDeploySpeed%s*%("] = ":SetDeploySpeedCloudbox%(",
-	
 }
 
 // "stopsounds" is now "stopsound"

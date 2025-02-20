@@ -59,22 +59,12 @@ function LoadCloudboxOffline(panel)
 	html:SetHTML("<html><head><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox-dark.css.txt' type='text/css' " .. darkCSS .. "><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline-dark.css.txt' type='text/css' " .. darkCSS .. "></head><body><div class='header'><div id='offlinenote'><p>You are in offline mode. Browse cached downloads or click Reconnect to go online.</p></div><div class='navbar'><a id='retry' onclick='cloudbox.RetryOnline(); return false;' href=\"javascript:void(0);\"><div class='navicon'></div><br>Reconnect</a></div></div><div class='clouds' id='topclouds'></div><div class='content'><div class='column_container'>" .. fallbackContent .. "</div></div></body></html>")
 	html:DockMargin(1,1,1,1)
 	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
-	html:AddFunction("cloudbox", "RetryOnline", function()
-		local spnMenu = panel:GetParent()
-		panel:Remove()
-		cbOnline = false
-		timer.Simple(0, function() -- timer required to prevent crash in Awesomium. Not needed for CEF.
-			local newPanel = AddCloudboxTab()
-			newPanel:Dock(FILL)
-			spnMenu:Add(newPanel)
-		end)
-	end)
+	html:AddFunction("cloudbox", "RetryOnline", function() RunConsoleCommand("cloudbox_reload") end)
 
 	cbHtmlOffline = html
 end
 
 function AddCloudboxTab()
-
 	-- Blue background container
 	local panel = vgui.Create("DPanel")
 	panel:SetBackgroundColor(Color(184, 227, 255, 255))
@@ -89,16 +79,12 @@ function AddCloudboxTab()
 	local isSpinning = true
 	spinner:SetSize(78, 78)
 	function spinner:Paint(w, h)
-		if isSpinning then
-			surface.SetDrawColor(color_white)
-			surface.SetMaterial(spinnerImg)
-			surface.DrawTexturedRectRotated(w / 2, h / 2, w, h, -((CurTime() / 5) % 1) * 360)
-		end
+		if not isSpinning then return end
+		surface.SetDrawColor(color_white)
+		surface.SetMaterial(spinnerImg)
+		surface.DrawTexturedRectRotated(w / 2, h / 2, w, h, -((CurTime() / 5) % 1) * 360)
 	end
-	timer.Simple(10, function()
-		isSpinning = false
-	end)
-
+	timer.Simple(10, function() isSpinning = false end)
 
 	-- Fallback panel
 	local container = vgui.Create("DPanel", panel)
@@ -130,16 +116,7 @@ function AddCloudboxTab()
 	local btnRetry = vgui.Create("DButton", container)
 	btnRetry:SetText("Reconnect")
 	btnRetry:SetFont("Trebuchet18")
-	btnRetry.DoClick = function()
-		local spnMenu = panel:GetParent()
-		panel:Remove()
-		cbOnline = false
-		timer.Simple(0, function() -- timer required to prevent crash in Awesomium. Not needed for CEF.
-			local newPanel = AddCloudboxTab()
-			newPanel:Dock(FILL)
-			spnMenu:Add(newPanel)
-		end)
-	end
+	btnRetry:SetConsoleCommand("cloudbox_reload")
 	btnRetry:Dock(LEFT)
 	btnRetry:DockMargin(5,10,5,10)
 	btnRetry:SetWidth(120)
@@ -175,7 +152,7 @@ function AddCloudboxTab()
 	end
 
 	html:Dock(FILL)
-	html:OpenURL("https://safe.cl0udb0x.com")
+	html:OpenURL(GetConVar("cloudbox_url"):GetString())
 	html:SetVisible(false)
 	html:DockMargin(1,1,1,1)
 
@@ -199,8 +176,10 @@ function AddCloudboxTab()
 	end)
 
 	html.OnChangeTitle = function(_, title)
-		if not (not cbOnline and title == "Cloudbox") then return end
+		if cbOnline then return end
+		if title != "Cloudbox" then print("[Cloudbox] Website is not valid. Returned title \"" .. title .. "\" ") return end
 
+		print("[Cloudbox] Website successfully loaded")
 		cbOnline = true
 		html:SetVisible(true)
 		if GetConVar("cloudbox_darkmode"):GetBool() then html:QueueJavascript("forceMode(true);") end
@@ -214,11 +193,31 @@ function AddCloudboxTab()
 		spawnmenu.SwitchCreationTab("Cloudbox")
 	end)
 
+	concommand.Add("cloudbox_reload", function()
+		-- Timers don't run while in console in SP, so we need to prevent it stacking multiple panel removes before it has had a chance to create the replacement panel
+		timer.Remove("cloudbox_reload_timer")
+		timer.Create("cloudbox_reload_timer", 0, 1, function()
+			print("[Cloudbox] Reloading Cloudbox")
+			local spnMenu = panel:GetParent()
+			panel:Remove()
+			cbOnline = false
+			timer.Simple(0, function() -- this timer required to prevent crash in Awesomium. Not needed for CEF.
+				local newPanel = AddCloudboxTab()
+				newPanel:Dock(FILL)
+				spnMenu:Add(newPanel)
+			end)
+		end)
+	end)
+
 	cbHtmlOnline = html
 
 	return panel
 end
 
 CreateConVar("cloudbox_darkmode", "0", FCVAR_ARCHIVE, "Cloudbox interface dark mode", 0, 1)
+CreateConVar("cloudbox_url", "https://safe.cl0udb0x.com", FCVAR_NONE, "Cloudbox frontend URL")
+
+cvars.RemoveChangeCallback("cloudbox_url", "cloudbox_url_change")
+cvars.AddChangeCallback("cloudbox_url", function(var, from, to) RunConsoleCommand("cloudbox_reload") end, "cloudbox_url_change")
 
 spawnmenu.AddCreationTab("Cloudbox", AddCloudboxTab, "materials/icon16/weather_clouds.png", 999, "Download stuff from Cloudbox!")
