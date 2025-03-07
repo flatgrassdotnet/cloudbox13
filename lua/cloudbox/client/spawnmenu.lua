@@ -24,7 +24,7 @@ function LoadCloudboxOffline(panel)
 	if cbHtmlOnline then cbHtmlOnline:SetVisible(false) end
 
 	local fallbackContent = ""
-	local fallbackCats = {{"entity", "Entities"}, {"weapon", "Weapons"}, {"map", "Maps"}}
+	local fallbackCats = {{"entity", language.GetPhrase("spawnmenu.category.entities")}, {"weapon", language.GetPhrase("spawnmenu.category.weapons")}, {"map", language.GetPhrase("addons.map")}}
 	local fallbackCatsList = {entity = "", weapon = "", map = ""}
 
 	local cachedFiles = file.Find("cloudbox/downloads/*.json", "DATA")
@@ -65,6 +65,8 @@ function LoadCloudboxOffline(panel)
 end
 
 function AddCloudboxTab()
+	cbOnline = false
+
 	-- Blue background container
 	local panel = vgui.Create("DPanel")
 	panel:SetBackgroundColor(Color(184, 227, 255, 255))
@@ -96,7 +98,7 @@ function AddCloudboxTab()
 	container:DockPadding(5,0,5,0)
 
 	local txt1 = vgui.Create("DLabel", container)
-	txt1:SetText("Loading Cloudbox...")
+	txt1:SetText(string.NiceName(language.GetPhrase("loading")) .. " Cloudbox...")
 	txt1:SetFont("HudDefault")
 	txt1:SetAutoStretchVertical(true)
 	txt1:SetContentAlignment(5)
@@ -122,7 +124,7 @@ function AddCloudboxTab()
 	btnRetry:SetWidth(120)
 
 	local btnOpt = vgui.Create("DButton", container)
-	btnOpt:SetText("Options")
+	btnOpt:SetText(string.NiceName(language.GetPhrase("options")))
 	btnOpt:SetFont("Trebuchet18")
 	btnOpt.DoClick = function() spawnmenu.ActivateTool("CloudboxUser", true) end
 	btnOpt:Dock(LEFT)
@@ -152,7 +154,6 @@ function AddCloudboxTab()
 	end
 
 	html:Dock(FILL)
-	html:OpenURL(GetConVar("cloudbox_url"):GetString())
 	html:SetVisible(false)
 	html:DockMargin(1,1,1,1)
 
@@ -170,6 +171,18 @@ function AddCloudboxTab()
 			gui.OpenURL("https://steamcommunity.com/id/keroronpa")
 		end
 	end)
+	html:AddFunction( "cloudbox", "GetTranslations", function( reqKeys )
+		reqKeys = string.Split(reqKeys, ",")
+		local translated = {}
+		for k,v in ipairs( reqKeys ) do
+			if language.GetPhrase(v) == v then -- if the phrase doesn't exist, set to blank to avoid re-requesting
+				translated[v] = ""
+			else
+				translated[v] = language.GetPhrase(v)
+			end
+		end
+		return util.TableToJSON(translated)
+	end )
 
 	html:AddFunction("cloudbox", "ToggleDarkMode", function(param)
 		GetConVar("cloudbox_darkmode"):SetBool(param)
@@ -186,6 +199,8 @@ function AddCloudboxTab()
 
 		if cbHtmlOffline then cbHtmlOffline:Remove() end
 	end
+	
+	html:OpenURL(GetConVar("cloudbox_url"):GetString())
 
 	concommand.Add("cloudbox_localmode", function()
 		cbOnline = true
