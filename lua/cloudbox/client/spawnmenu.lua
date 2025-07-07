@@ -162,6 +162,7 @@ function AddCloudboxTab()
 	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
 	html:AddFunction("cloudbox", "SetFocused", CloudboxFocus)
 	html:AddFunction("cloudbox", "OpenSettings", function() spawnmenu.ActivateTool("CloudboxUser", true) end)
+	html:AddFunction("cloudbox", "OpenLocalMode", function() RunConsoleCommand("cloudbox_localmode") end)
 	html:AddFunction("cloudbox", "OpenLink", function(param)
 		if param == "workshop" then
 			gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/?id=3365311511")
@@ -169,6 +170,10 @@ function AddCloudboxTab()
 			gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/comments/3365311511")
 		elseif param == "pancakes" then
 			gui.OpenURL("https://steamcommunity.com/id/keroronpa")
+		elseif param == "flatgrass" then
+			gui.OpenURL("https://flatgrass.net")
+		elseif param == "flatgrass-toybox" then
+			gui.OpenURL("https://flatgrass.net/toybox.html")
 		end
 	end)
 	html:AddFunction( "cloudbox", "GetTranslations", function( reqKeys )
