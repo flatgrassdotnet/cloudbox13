@@ -112,7 +112,6 @@ function cEntity:SetModelScaleCloudbox(vector)
 end
 
 function cEntity:EmitSoundCloudbox(soundName, soundLevel, pitchPercent, volume, channel, soundFlags, dsp, filter)
-	
 	// TF2 Fix
 	if string.EndsWith(soundName, ".wav") and not file.Exists("sound/" .. soundName, "GAME") and file.Exists("sound/" .. string.Replace(soundName, ".wav", ".mp3"), "GAME") then
 		soundName = string.Replace(soundName, ".wav", ".mp3")
@@ -329,19 +328,19 @@ CloudboxScriptReplacements = {
 
 	// Normalize no longer returns a value
 	[":Normalize%(%)"] = ":NormalizeCloudbox%(%)",
-	
+
 	// Fix some scripts providing non-numerical values to Lerp. Global Lerp only.
 	["%sLerp%s*%("] = " LerpCloudbox%(",
-	
+
 	// 180179 "Pixel Weapon"
 	["colorPnl:GetTable%(%)%.AlphaBar:GetTable%(%)%.imgBackground%.Paint = function%(%) end"] = "",
-	
+
 	// pairs breaks when provided with nil
 	["%spairs%s*%("] = " pairsCloudbox%(",
-	
+
 	// SetWeaponHoldType can't accept nil
 	[":SetWeaponHoldType%s*%("] = ":SetWeaponHoldTypeCloudbox%(",
-	
+
 	// SetDeploySpeed can't accept nil
 	[":SetDeploySpeed%s*%("] = ":SetDeploySpeedCloudbox%(",
 }
