@@ -164,17 +164,18 @@ function AddCloudboxTab()
 	html:AddFunction("cloudbox", "OpenSettings", function() spawnmenu.ActivateTool("CloudboxUser", true) end)
 	html:AddFunction("cloudbox", "OpenLocalMode", function() RunConsoleCommand("cloudbox_localmode") end)
 	html:AddFunction("cloudbox", "OpenLink", function(param)
-		if param == "workshop" then
-			gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/?id=3365311511")
-		elseif param == "workshop-comments" then
-			gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/comments/3365311511")
-		elseif param == "pancakes" then
-			gui.OpenURL("https://steamcommunity.com/id/keroronpa")
-		elseif param == "flatgrass" then
-			gui.OpenURL("https://flatgrass.net")
-		elseif param == "flatgrass-toybox" then
-			gui.OpenURL("https://flatgrass.net/toybox.html")
-		end
+		local commands = {
+			["workshop"] = "https://steamcommunity.com/sharedfiles/filedetails/?id=3365311511",
+			["workshop-comments"] = "https://steamcommunity.com/sharedfiles/filedetails/comments/3365311511",
+			["pancakes"] = "https://steamcommunity.com/id/keroronpa",
+			["flatgrass"] = "https://flatgrass.net",
+			["flatgrass-toybox"] = "https://flatgrass.net/toybox.html"
+		}
+
+		local url = commands[param]
+		if not url then return end
+
+		gui.OpenURL(url)
 	end)
 	html:AddFunction( "cloudbox", "GetTranslations", function( reqKeys )
 		reqKeys = string.Split(reqKeys, ",")
