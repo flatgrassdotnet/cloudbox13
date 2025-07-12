@@ -1,6 +1,6 @@
 /*
 	cloudbox13 - cloudbox client for gmod 13
-	Copyright (C) 2024  patapancakes <patapancakes@pagefault.games>
+	Copyright (C) 2024 - 2025  patapancakes <patapancakes@pagefault.games>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Affero General Public License as published by
@@ -205,7 +205,7 @@ function AddCloudboxTab()
 
 		if cbHtmlOffline then cbHtmlOffline:Remove() end
 	end
-	
+
 	html:OpenURL(GetConVar("cloudbox_url"):GetString())
 
 	concommand.Add("cloudbox_localmode", function()
