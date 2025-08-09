@@ -16,11 +16,10 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-local cbOnline = false
 local cbHtmlOnline = nil
 local cbHtmlOffline = nil
 
-function LoadCloudboxOffline(panel)
+local function LoadCloudboxOffline(panel)
 	if cbHtmlOnline then cbHtmlOnline:SetVisible(false) end
 
 	local fallbackContent = ""
@@ -50,13 +49,9 @@ function LoadCloudboxOffline(panel)
 		fallbackContent = fallbackContent .. "<div class='pillbox column'><h2 class='pillbox'>" .. v[2] .. "</h2><br/>" .. txt .. "</div> "
 	end
 
-	local isDark = GetConVar("cloudbox_darkmode"):GetBool()
-	local darkCSS = " disabled"
-	if isDark then darkCSS = "" end
-
 	local html = vgui.Create("DHTML", panel)
 	html:Dock(FILL)
-	html:SetHTML("<html><head><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox-dark.css.txt' type='text/css' " .. darkCSS .. "><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline.css.txt' type='text/css'><link class='darkmode' rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline-dark.css.txt' type='text/css' " .. darkCSS .. "></head><body><div class='header'><div id='offlinenote'><p>You are in offline mode. Browse cached downloads or click Reconnect to go online.</p></div><div class='navbar'><a id='retry' onclick='cloudbox.RetryOnline(); return false;' href=\"javascript:void(0);\"><div class='navicon'></div><br>Reconnect</a></div></div><div class='clouds' id='topclouds'></div><div class='content'><div class='column_container'>" .. fallbackContent .. "</div></div></body></html>")
+	html:SetHTML("<html><head><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/cloudbox.css.txt' type='text/css'><link rel='stylesheet' href='asset://garrysmod/data_static/cloudbox/offline.css.txt' type='text/css'></head><body><div class='header'><div id='offlinenote'><p>You are in offline mode. Browse cached downloads or click Reconnect to go online.</p></div><div class='navbar'><a id='retry' onclick='cloudbox.RetryOnline(); return false;' href=\"javascript:void(0);\"><div class='navicon'></div><br>Reconnect</a></div></div><div class='clouds' id='topclouds'></div><div class='content'><div class='column_container'>" .. fallbackContent .. "</div></div></body></html>")
 	html:DockMargin(1,1,1,1)
 	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
 	html:AddFunction("cloudbox", "RetryOnline", function() RunConsoleCommand("cloudbox_reload") end)
@@ -64,9 +59,74 @@ function LoadCloudboxOffline(panel)
 	cbHtmlOffline = html
 end
 
-function AddCloudboxTab()
-	cbOnline = false
+local function LoadCloudboxOnline(panel)
+	-- Online panel
+	local html = vgui.Create("DHTML", panel)
 
+	local function CloudboxFocus(focus)
+		local id = "OnTextEntryGetFocus" if not focus then id = "OnTextEntryLoseFocus" end
+		hook.Run(id, html)
+	end
+
+	html:Dock(FILL)
+	html:SetVisible(false)
+	html:DockMargin(1,1,1,1)
+
+	html.Paint = function() return false end
+
+	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
+	html:AddFunction("cloudbox", "SetFocused", CloudboxFocus)
+	html:AddFunction("cloudbox", "OpenSettings", function() spawnmenu.ActivateTool("CloudboxUser", true) end)
+	html:AddFunction("cloudbox", "OpenLocalMode", function() RunConsoleCommand("cloudbox_localmode") end)
+	html:AddFunction("cloudbox", "OpenLink", function(param)
+		param = string.lower(param)
+		if string.StartsWith(param, "https://flatgrass.net/") or string.StartsWith(param, "https://cl0udb0x.com/") or param == "https://flatgrass.net" then
+			gui.OpenURL(param)
+			return
+		end
+		
+		local commands = {
+			["workshop"] = "https://steamcommunity.com/sharedfiles/filedetails/?id=3365311511",
+			["workshop-comments"] = "https://steamcommunity.com/sharedfiles/filedetails/comments/3365311511",
+			["pancakes"] = "https://steamcommunity.com/id/keroronpa"
+		}
+
+		local url = commands[param]
+		if not url then return end
+
+		gui.OpenURL(url)
+	end)
+	html:AddFunction( "cloudbox", "GetTranslations", function( reqKeys )
+		reqKeys = string.Split(reqKeys, ",")
+		local translated = {}
+		for k,v in ipairs( reqKeys ) do
+			if language.GetPhrase(v) == v then -- if the phrase doesn't exist, set to blank to avoid re-requesting
+				translated[v] = ""
+			else
+				translated[v] = language.GetPhrase(v)
+			end
+		end
+		return util.TableToJSON(translated)
+	end )
+
+	html.OnChangeTitle = function(_, title)
+		if title != "Cloudbox" then print("[Cloudbox] Website is not valid. Returned title \"" .. title .. "\". Website may be offline or may require addon update.") return end
+
+		print("[Cloudbox] Website successfully loaded")
+		html.OnChangeTitle = nil
+		html:SetVisible(true)
+		
+		if GetConVar("cloudbox_lowfps"):GetBool() then html:QueueJavascript("useReducedMotion();") end
+
+		if cbHtmlOffline then cbHtmlOffline:Remove() end
+	end
+
+	html:OpenURL(GetConVar("cloudbox_url"):GetString())
+	
+	cbHtmlOnline = html
+end
+
+local function AddCloudboxTab()
 	-- Blue background container
 	local panel = vgui.Create("DPanel")
 	panel:SetBackgroundColor(Color(184, 227, 255, 255))
@@ -144,72 +204,12 @@ function AddCloudboxTab()
 		spinner:SetPos(spinner:GetX(), spinner:GetY() - 100)
 		container:Center()
 	end
-
+	
 	-- Online panel
-	local html = vgui.Create("DHTML", panel)
+	LoadCloudboxOnline(panel)
 
-	local function CloudboxFocus(focus)
-		local id = "OnTextEntryGetFocus" if not focus then id = "OnTextEntryLoseFocus" end
-		hook.Run(id, html)
-	end
-
-	html:Dock(FILL)
-	html:SetVisible(false)
-	html:DockMargin(1,1,1,1)
-
-	html.Paint = function() return false end
-
-	html:AddFunction("cloudbox", "GetPackage", RequestCloudboxDownload)
-	html:AddFunction("cloudbox", "SetFocused", CloudboxFocus)
-	html:AddFunction("cloudbox", "OpenSettings", function() spawnmenu.ActivateTool("CloudboxUser", true) end)
-	html:AddFunction("cloudbox", "OpenLocalMode", function() RunConsoleCommand("cloudbox_localmode") end)
-	html:AddFunction("cloudbox", "OpenLink", function(param)
-		local commands = {
-			["workshop"] = "https://steamcommunity.com/sharedfiles/filedetails/?id=3365311511",
-			["workshop-comments"] = "https://steamcommunity.com/sharedfiles/filedetails/comments/3365311511",
-			["pancakes"] = "https://steamcommunity.com/id/keroronpa",
-			["flatgrass"] = "https://flatgrass.net",
-			["flatgrass-toybox"] = "https://flatgrass.net/toybox.html"
-		}
-
-		local url = commands[param]
-		if not url then return end
-
-		gui.OpenURL(url)
-	end)
-	html:AddFunction( "cloudbox", "GetTranslations", function( reqKeys )
-		reqKeys = string.Split(reqKeys, ",")
-		local translated = {}
-		for k,v in ipairs( reqKeys ) do
-			if language.GetPhrase(v) == v then -- if the phrase doesn't exist, set to blank to avoid re-requesting
-				translated[v] = ""
-			else
-				translated[v] = language.GetPhrase(v)
-			end
-		end
-		return util.TableToJSON(translated)
-	end )
-
-	html:AddFunction("cloudbox", "ToggleDarkMode", function(param)
-		GetConVar("cloudbox_darkmode"):SetBool(param)
-	end)
-
-	html.OnChangeTitle = function(_, title)
-		if cbOnline then return end
-		if title != "Cloudbox" then print("[Cloudbox] Website is not valid. Returned title \"" .. title .. "\" ") return end
-
-		print("[Cloudbox] Website successfully loaded")
-		cbOnline = true
-		html:SetVisible(true)
-		if GetConVar("cloudbox_darkmode"):GetBool() then html:QueueJavascript("forceMode(true);") end
-
-		if cbHtmlOffline then cbHtmlOffline:Remove() end
-	end
-
-	html:OpenURL(GetConVar("cloudbox_url"):GetString())
-
+	-- Commands
 	concommand.Add("cloudbox_localmode", function()
-		cbOnline = true
 		LoadCloudboxOffline(panel)
 		spawnmenu.SwitchCreationTab("Cloudbox")
 	end)
@@ -221,7 +221,6 @@ function AddCloudboxTab()
 			print("[Cloudbox] Reloading Cloudbox")
 			local spnMenu = panel:GetParent()
 			panel:Remove()
-			cbOnline = false
 			timer.Simple(0, function() -- this timer required to prevent crash in Awesomium. Not needed for CEF.
 				local newPanel = AddCloudboxTab()
 				newPanel:Dock(FILL)
@@ -230,13 +229,14 @@ function AddCloudboxTab()
 		end)
 	end)
 
-	cbHtmlOnline = html
-
 	return panel
 end
 
-CreateConVar("cloudbox_darkmode", "0", FCVAR_ARCHIVE, "Cloudbox interface dark mode", 0, 1)
+CreateConVar("cloudbox_lowfps", "0", FCVAR_ARCHIVE, "Disable Cloudbox animations for low FPS devices.", 0, 1)
 CreateConVar("cloudbox_url", "https://safe.cl0udb0x.com", FCVAR_NONE, "Cloudbox frontend URL")
+
+cvars.RemoveChangeCallback("cloudbox_lowfps", "cloudbox_lowfps_change")
+cvars.AddChangeCallback("cloudbox_lowfps", function(var, from, to) RunConsoleCommand("cloudbox_reload") end, "cloudbox_lowfps_change")
 
 cvars.RemoveChangeCallback("cloudbox_url", "cloudbox_url_change")
 cvars.AddChangeCallback("cloudbox_url", function(var, from, to) RunConsoleCommand("cloudbox_reload") end, "cloudbox_url_change")
