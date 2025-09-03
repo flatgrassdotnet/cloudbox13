@@ -1,2 +1,0 @@
-#topclouds {background-image: url("asset://garrysmod/materials/cloudbox/clouds-dark.png");}
-.pillbox.column:not(:first-child), .pillbox.column:not(:last-child) {border-color: #273b52;}
