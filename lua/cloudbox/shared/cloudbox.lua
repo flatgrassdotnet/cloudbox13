@@ -50,7 +50,7 @@ function ExecuteCloudboxPackage(info)
 	if info["type"] == "entity" then
 		ENT = {}
 
-		RunString(script)
+		RunString(script, classname)
 
 		ENT.Spawnable = true
 		ENT.AdminSpawnable = true
@@ -59,7 +59,7 @@ function ExecuteCloudboxPackage(info)
 	elseif info["type"] == "weapon" then
 		SWEP = {Primary = {}, Secondary = {}}
 
-		RunString(script)
+		RunString(script, classname)
 
 		SWEP.Spawnable = true
 		SWEP.AdminSpawnable = true
