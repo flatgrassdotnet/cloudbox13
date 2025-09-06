@@ -104,11 +104,15 @@ function cPlayer:SetFOVCloudbox(fov, ...)
 end
 
 function cEntity:SetModelScaleCloudbox(vector)
+	// The way GM12's SetModelScale works does not match GM13's version. It much more closely matches EnableMatrix
+	// https://wiki.facepunch.com/gmod/Entity:EnableMatrix
+
 	self:SetLegacyTransform(true)
 
-	local x, y, z = vector:Unpack()
+	local mat = Matrix()
+	mat:Scale(vector)
 
-	self:SetModelScale((x + y + z) / 3)
+	self:EnableMatrix("RenderMultiply", mat)
 end
 
 function cEntity:EmitSoundCloudbox(soundName, soundLevel, pitchPercent, volume, channel, soundFlags, dsp, filter)
