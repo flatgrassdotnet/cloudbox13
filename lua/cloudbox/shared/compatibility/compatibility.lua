@@ -353,7 +353,7 @@ CloudboxScriptReplacements = {
 concommand.Add("stopsounds", function() RunConsoleCommand("stopsound") end)
 
 function gm13ize(script)
-	script = "local timer = timercb\nlocal file = filecb\n\n" .. script
+	script = "local timer = timercb local file = filecb " .. script
 
 	for match, replacement in pairs(CloudboxScriptReplacements) do
 		script = string.gsub(script, match, replacement)
