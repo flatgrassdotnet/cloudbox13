@@ -96,15 +96,23 @@ end
 function MountCloudboxPackage(info, attempt)
 	attempt = attempt or 1
 
-	// if client and package has no content then execute the script now
-	if CLIENT and !info["content"] then ExecuteCloudboxPackage(info) return end
+	// client is also the server, no need to download twice
+	if SERVER and !game.IsDedicated() then return end
+
+	// if package has no content then execute the script now
+	if !info["content"] then
+		if SERVER then return end
+
+		ExecuteCloudboxPackage(info)
+		return
+	end
 
 	// mount content, downloading first if needed
 	local path = "cloudbox/downloads/" .. info["id"] .. "r" .. info["rev"] .. ".gma"
 	if file.Exists(path, "DATA") then // if we have the package content locally then load it
 		local success = game.MountGMA("data/" .. path)
 		if !success and attempt < 3 then // delete and reacquire
-			file.Delete(path, "DATA") // FIXME: doesn't actually work because MountGMA doesn't release the file
+			file.Delete(path, "DATA")
 			MountCloudboxPackage(info, attempt + 1)
 			return
 		end
