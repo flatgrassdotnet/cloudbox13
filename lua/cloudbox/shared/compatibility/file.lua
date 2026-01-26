@@ -28,7 +28,14 @@ function CreateDir(dir) file.CreateDir(dir) end
 function Delete(filename) return file.Delete(filename, "DATA") end
 
 function Exists(filename, usebasefolder)
-	local path = "DATA" if usebasefolder then path = "GAME" end
+	local path = "DATA"
+	if usebasefolder then
+		path = "GAME"
+	elseif string.StartsWith(filename, "../") then
+		filename = string.sub(filename, 4)
+		path = "GAME"
+	end
+
 	local ex = file.Exists(filename, path)
 	if not ex and string.EndsWith(filename, ".wav") then // TF2 fix
 		ex = Exists(string.Replace(filename, ".wav", ".mp3"), usebasefolder)
