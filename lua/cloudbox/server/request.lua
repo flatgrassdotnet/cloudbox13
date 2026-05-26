@@ -112,11 +112,11 @@ net.Receive("CloudboxClientDownloadFinished", function(_, ply)
 
 	ActiveCloudboxDownloads[id]["downloaders"][ply:SteamID()] = true
 
-	progress = GetCloudboxDownloadProgress(id)
+	local progress = GetCloudboxDownloadProgress(id)
 
 	NotifyCloudboxDownloadProgress(id, progress)
 
-	if progress == 1 then
-		ExecuteCloudboxPackage(ActiveCloudboxDownloads[id]["info"])
-	end
+	if progress != 1 then return end
+
+	ExecuteCloudboxPackage(ActiveCloudboxDownloads[id]["info"])
 end)
