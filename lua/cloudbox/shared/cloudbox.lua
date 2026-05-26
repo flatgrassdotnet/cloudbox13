@@ -136,7 +136,7 @@ function MountCloudboxPackage(info, attempt)
 
 		local success = game.MountGMA("data/" .. path)
 		if !success and attempt < 3 then // delete and reacquire
-			file.Delete(path, "DATA") // FIXME: doesn't actually work because MountGMA doesn't release the file
+			file.Delete(path, "DATA")
 			MountCloudboxPackage(info, attempt + 1)
 			return
 		end
